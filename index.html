@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" href="style.css">
+    <title>Space Skirmish: Cross-Platform Masterpiece</title>
+
+    <style>
+        /* ========================================================
+           ✨ 画面全体のレイアウト調整
+           ======================================================== */
+        html, body {
+            margin: 0; 
+            padding: 0; 
+            overflow-y: auto; 
+            overflow-x: hidden;
+            background-color: #000;
+            font-family: 'Courier New', Courier, monospace;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        /* 3D画面エリア */
+        #canvas-container { 
+            position: relative;
+            width: 100%; 
+            height: 70vh; 
+            z-index: 1; 
+            touch-action: none; /* スマホのデフォルトスクロールをゲーム画面内だけ禁止 */
+        }
+
+        /* ゲーム開始前の案内画面 */
+        #instructions {
+            position: absolute; top: 0; left: 0; width: 100%; height: 70vh;
+            background: rgba(0,0,0,0.85);
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            color: #00ffff; z-index: 20; cursor: pointer; text-align: center;
+            padding: 0 10px;
+            box-sizing: border-box;
+        }
+        #instructions h1 { font-size: 1.8rem; text-shadow: 0 0 12px #00ffff; margin-bottom: 5px; }
+        #instructions p { font-size: 0.95rem; color: #fff; margin: 5px; }
+
+        /* ゲーム中のUI・照準 */
+        #hud-container {
+            position: absolute; top: 0; left: 0; width: 100%; height: 70vh;
+            z-index: 10; pointer-events: none; box-sizing: border-box;
+            border: 2px solid #00ffff;
+            box-shadow: inset 0 0 100px rgba(0, 253, 255, 0.15);
+            display: none;
+        }
+
+        .reticle {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 40px; height: 40px; border: 2px solid #00ffff; border-radius: 50%;
+        }
+        .reticle::before, .reticle::after { content: ''; position: absolute; background: #00ffff; }
+        .reticle::before { top: 19px; left: -12px; width: 12px; height: 2px; }
+        .reticle::after { top: 19px; right: -12px; width: 12px; height: 2px; }
+
+        .weapon-status {
+            position: absolute; bottom: 4%; left: 50%; transform: translateX(-50%);
+            color: #00ffff; font-size: 0.8rem; font-weight: bold;
+            background: rgba(0,20,25,0.85); padding: 5px 15px; border: 1px solid #00ffff;
+            text-shadow: 0 0 5px #00ffff;
+            white-space: nowrap;
+        }
+
+        .hit-indicator {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 60px; height: 60px; border: 2px solid #ff3333; border-radius: 50%;
+            display: none; color: #ff3333; font-weight: bold; text-align: center; line-height: 60px;
+            text-shadow: 0 0 8px #ff3333; box-shadow: 0 0 10px #ff3333;
+        }
+
+        .score-board {
+            position: absolute; top: 4%; right: 4%; color: #00ffff; font-weight: bold;
+            font-size: 1rem; text-shadow: 0 0 5px #00ffff;
+        }
+
+        /* 💡 スマホ用バーチャルコントローラー（初期状態は非表示、スマホ検出時にJSでONにする） */
+        #mobile-controls {
+            display: none;
+            position: absolute; bottom: 5%; left: 0; width: 100%; height: 130px;
+            z-index: 25; pointer-events: none;
+        }
+        .btn-move-pad {
+            position: absolute; left: 6%; bottom: 10px; width: 110px; height: 110px;
+            pointer-events: auto;
+        }
+        /* 十字移動ボタンのデザイン */
+        .m-btn {
+            position: absolute; width: 36px; height: 36px; background: rgba(0, 253, 255, 0.25);
+            border: 1px solid #00ffff; color: #00ffff; text-align: center; line-height: 34px;
+            font-size: 0.9rem; font-weight: bold; border-radius: 6px;
+        }
+        .m-btn:active { background: rgba(0, 253, 255, 0.7); color: #000; }
+        #btn-w { top: 0; left: 37px; }
+        #btn-s { bottom: 0; left: 37px; }
+        #btn-a { top: 37px; left: 0; }
+        #btn-d { top: 37px; right: 0; }
+
+        /* 特大攻撃ボタン */
+        #btn-fire {
+            position: absolute; right: 8%; bottom: 15px; width: 75px; height: 75px;
+            background: rgba(255, 50, 50, 0.3); border: 2px solid #ff3333; border-radius: 50%;
+            color: #ff3333; font-weight: bold; text-align: center; line-height: 71px;
+            font-size: 1.1rem; pointer-events: auto; text-shadow: 0 0 5px #ff3333;
+            box-shadow: 0 0 10px rgba(255,50,50,0.2);
+        }
+        #btn-fire:active { background: rgba(255, 50, 50, 0.8); color: #fff; }
+
+        /* 特大解除ボタン */
+        #btn-exit {
+            position: absolute; top: 4%; left: 4%; padding: 6px 12px;
+            background: rgba(255,255,255,0.1); border: 1px solid #fff; color: #fff;
+            font-size: 0.8rem; border-radius: 4px; pointer-events: auto; display: none; z-index: 26;
+        }
+
+        /* 💡 ポートフォリオ記事エリア */
+        .article-section {
+            position: relative;
+            z-index: 30; 
+            background-color: #0b0f19; 
+            color: #ffffff;
+            padding: 40px 20px;
+            min-height: 100vh; 
+        }
+        .article-container { max-width: 800px; margin: 0 auto; }
+        .article-section h2 { color: #00ffff; border-bottom: 2px solid #00ffff; padding-bottom: 10px; font-size: 1.6rem; }
+    </style>
+</head>
+
+<body>
+
+    <div style="position: relative; width: 100%; height: 70vh; background:#000;">
+        <button id="btn-exit">❌ QUIT GAME</button>
+
+        <div id="instructions">
+            <h1>[ SPACE SKIRMISH ]</h1>
+            <p>【PC】クリックして出撃 (WASD推進)</p>
+            <p>【スマホ】タップして出撃 (画面スワイプ照準)</p>
+        </div>
+
+        <div id="canvas-container"></div>
+
+        <div id="hud-container">
+            <div class="reticle"></div>
+            <div class="hit-indicator" id="hit-ui">HIT</div>
+            <div class="score-board">💥 DESTRUCTED: <span id="score-val">0</span></div>
+            <div class="weapon-status">🤖 MOBILE SIMULATION SYSTEM V3.5</div>
+        </div>
+
+        <div id="mobile-controls">
+            <div class="btn-move-pad">
+                <div class="m-btn" id="btn-w">W</div>
+                <div class="m-btn" id="btn-a">A</div>
+                <div class="m-btn" id="btn-s">S</div>
+                <div class="m-btn" id="btn-d">D</div>
+            </div>
+            <div id="btn-fire">FIRE</div>
+        </div>
+    </div>
+
+    <div class="article-section">
+        <div class="article-container">
+            <h2>趣味の置き場所</h2>
+            <p style="line-height: 1.8; color: #ccc; font-size: 1.05rem;">
+                一応ポートフォリオですが、趣味であるプラモデルとその関連の情報をアップしていきます。
+            </p>
+        </div>
+    </div>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+
+        // --- デバイス判定 ---
+        const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+
+        // --- 基本設定 ---
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x000003);
+        scene.fog = new THREE.FogExp2(0x000003, 0.0035);
+
+        const camera = new THREE.PerspectiveCamera(65, window.innerWidth / (window.innerHeight * 0.7), 0.1, 1000);
+        camera.position.set(0, 0, 60);
+
+        // カメラ角度の管理用オブジェクト
+        const cameraRotation = { yaw: 0, pitch: 0 };
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight * 0.7);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        container.appendChild(renderer.domElement);
+
+        // ライティング
+        const ambientLight = new THREE.AmbientLight(0x444455); scene.add(ambientLight);
+        const sunLight = new THREE.DirectionalLight(0xffffff, 2.2); sunLight.position.set(60, 100, 50); scene.add(sunLight);
+        const reflexLight = new THREE.DirectionalLight(0x5588ff, 0.8); reflexLight.position.set(-50, -50, -30); scene.add(reflexLight);
+
+        // UI要素
+        const instructions = document.getElementById('instructions');
+        const hud = document.getElementById('hud-container');
+        const hitUi = document.getElementById('hit-ui');
+        const scoreVal = document.getElementById('score-val');
+        const mobileControls = document.getElementById('mobile-controls');
+        const btnExit = document.getElementById('btn-exit');
+        let destroyedCount = 0;
+        let isGameActive = false;
+
+        // --- ゲームのアクティブ状態の制御（PC/スマホ統合） ---
+        function activateGame() {
+            isGameActive = true;
+            instructions.style.display = 'none';
+            hud.style.display = 'block';
+            btnExit.style.display = 'block';
+            if(isTouchDevice) mobileControls.style.display = 'block';
+
+            // スクロールを完全にロック（照準ズレ完全防止）
+            window.scrollTo(0, 0);
+            document.body.style.overflow = 'hidden';
+            document.documentElement.style.overflow = 'hidden';
+        }
+
+        function deactivateGame() {
+            isGameActive = false;
+            instructions.style.display = 'flex';
+            hud.style.display = 'none';
+            btnExit.style.display = 'none';
+            mobileControls.style.display = 'none';
+
+            // スクロールを再許可
+            document.body.style.overflow = 'auto';
+            document.documentElement.style.overflow = 'auto';
+        }
+
+        instructions.addEventListener('click', activateGame);
+        btnExit.addEventListener('click', (e) => { e.stopPropagation(); deactivateGame(); });
+
+        // --- 🕹️ 新・ドラッグ＆スワイプ視点移動システム ---
+        let isPointerDown = false;
+        let previousPointerPosition = { x: 0, y: 0 };
+
+        container.addEventListener('pointerdown', (e) => {
+            if (!isGameActive) return;
+            isPointerDown = true;
+            previousPointerPosition = { x: e.clientX, y: e.clientY };
+        });
+
+        window.addEventListener('pointermove', (e) => {
+            if (!isGameActive || !isPointerDown) return;
+
+            const deltaX = e.clientX - previousPointerPosition.x;
+            const deltaY = e.clientY - previousPointerPosition.y;
+
+            // 旋回速度調整（スマホ用に少しマイルドに調整）
+            const speedMultiplier = 0.003;
+            cameraRotation.yaw -= deltaX * speedMultiplier;
+            cameraRotation.pitch -= deltaY * speedMultiplier;
+
+            // 真上・真下を向けないようにロック
+            cameraRotation.pitch = Math.max(-Math.PI / 2.1, Math.min(Math.PI / 2.1, cameraRotation.pitch));
+
+            // クォータニオンで正確なFPSカメラ回転を適用
+            const qYaw = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), cameraRotation.yaw);
+            const qPitch = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), cameraRotation.pitch);
+            camera.quaternion.copy(qYaw).multiply(qPitch);
+
+            previousPointerPosition = { x: e.clientX, y: e.clientY };
+        });
+
+        window.addEventListener('pointerup', () => { isPointerDown = false; });
+
+        // --- ⌨️ PC用キーボード移動設定 ---
+        const move = { forward: false, backward: false, left: false, right: false };
+        window.addEventListener('keydown', (e) => {
+            if(!isGameActive) return;
+            if (e.code === 'KeyW') move.forward = true; if (e.code === 'KeyS') move.backward = true;
+            if (e.code === 'KeyA') move.left = true;    if (e.code === 'KeyD') move.right = true;
+        });
+        window.addEventListener('keyup', (e) => {
+            if (e.code === 'KeyW') move.forward = false; if (e.code === 'KeyS') move.backward = false;
+            if (e.code === 'KeyA') move.left = false;    if (e.code === 'KeyD') move.right = false;
+        });
+
+        // --- 📱 スマホ用バーチャルボタンのイベント処理 ---
+        function setupMobileBtn(id, property) {
+            const btn = document.getElementById(id);
+            btn.addEventListener('touchstart', (e) => { e.preventDefault(); move[property] = true; }, {passive: false});
+            btn.addEventListener('touchend', (e) => { e.preventDefault(); move[property] = false; }, {passive: false});
+        }
+        setupMobileBtn('btn-w', 'forward');
+        setupMobileBtn('btn-s', 'backward');
+        setupMobileBtn('btn-a', 'left');
+        setupMobileBtn('btn-d', 'right');
+
+        // --- 💥 シューティング処理（PCクリック ＆ スマホFIREボタン両対応） ---
+        const playerBeams = [];
+        function fireBeam() {
+            if (!isGameActive) return;
+            const beamGeo = new THREE.CylinderGeometry(0.06, 0.06, 6); beamGeo.rotateX(Math.PI / 2);
+            const beamMesh = new THREE.Mesh(beamGeo, new THREE.MeshBasicMaterial({ color: 0x00ffff }));
+            beamMesh.position.copy(camera.position);
+
+            const dir = new THREE.Vector3(); camera.getWorldDirection(dir);
+            beamMesh.position.addScaledVector(dir, 2); beamMesh.lookAt(beamMesh.position.clone().add(dir));
+            beamMesh.userData = { direction: dir, speed: 9.0 };
+            scene.add(beamMesh); playerBeams.push(beamMesh);
+        }
+
+        // PCなら背景クリックで発射（ただしUIボタンを触っていない時のみ）
+        container.addEventListener('click', (e) => { if(!isTouchDevice) fireBeam(); });
+        // スマホなら専用のFIREボタンタップで発射
+        document.getElementById('btn-fire').addEventListener('touchstart', (e) => { e.preventDefault(); fireBeam(); }, {passive: false});
+
+
+        // --- 背景星の生成 ---
+        const starsGeometry = new THREE.BufferGeometry();
+        const starPositions = new Float32Array(2500 * 3);
+        for(let i = 0; i < 2500 * 3; i++) starPositions[i] = (Math.random() - 0.5) * 700;
+        starsGeometry.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
+        scene.add(new THREE.Points(starsGeometry, new THREE.PointsMaterial({ color: 0xffffff, size: 0.6 })));
+
+        // --- 超精密・カラーマテリアル ---
+        const matWhite = new THREE.MeshStandardMaterial({ color: 0xeaeaea, roughness: 0.4, metalness: 0.1 });
+        const matBlue = new THREE.MeshStandardMaterial({ color: 0x143c91, roughness: 0.4 });
+        const matRed = new THREE.MeshStandardMaterial({ color: 0xb01212, roughness: 0.4 });
+        const matYellow = new THREE.MeshStandardMaterial({ color: 0xcaa006, roughness: 0.3 });
+        const matZakuGreen = new THREE.MeshStandardMaterial({ color: 0x425e42, roughness: 0.5 });
+        const matZakuDark = new THREE.MeshStandardMaterial({ color: 0x243624, roughness: 0.5 });
+        const matFrame = new THREE.MeshStandardMaterial({ color: 0x3a3a3a, roughness: 0.5, metalness: 0.6 });
+        const matGlowPink = new THREE.MeshBasicMaterial({ color: 0xff2277 });
+        const matGlowYellow = new THREE.MeshBasicMaterial({ color: 0xecff33 });
+
+        // ==========================================
+        // 🤖 RX-78-2 ガンダム
+        // ==========================================
+        function createAdvancedGundam() {
+            const g = new THREE.Group();
+            const chest = new THREE.Mesh(new THREE.BoxGeometry(2.6, 1.3, 1.8), matBlue); chest.position.y = 1.2;
+            const ductL = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.4, 0.2), matYellow); ductL.position.set(0.6, 1.2, 0.91);
+            const ductR = ductL.clone(); ductR.position.x = -0.6; g.add(chest, ductL, ductR);
+
+            const abs = new THREE.Mesh(new THREE.BoxGeometry(1.9, 0.9, 1.5), matRed); abs.position.y = 0.2;
+            const waist = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.8, 1.7), matWhite); waist.position.y = -0.6;
+            const waistCenter = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.6, 0.2), matRed); waistCenter.position.set(0, -0.6, 0.86);
+            const vBlock = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.2, 0.1), matYellow); vBlock.position.set(0, -0.6, 0.96); g.add(abs, waist, waistCenter, vBlock);
+
+            const head = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.9, 0.9), matWhite); head.position.y = 2.2;
+            const faceBase = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.6, 0.2), matFrame); faceBase.position.set(0, 2.1, 0.4);
+            const chin = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.25, 0.2), matRed); chin.position.set(0, 1.8, 0.46);
+            const eyeL = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.07, 0.1), matGlowYellow); eyeL.position.set(0.16, 2.2, 0.48);
+            const eyeR = eyeL.clone(); eyeR.position.x = -0.16;
+            const antennaCenter = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.25, 0.15), matRed); antennaCenter.position.set(0, 2.5, 0.46);
+            const vFinL = new THREE.Mesh(new THREE.ConeGeometry(0.06, 1.4, 4), matWhite); vFinL.rotation.z = -0.6; vFinL.position.set(0.4, 3.0, 0.46);
+            const vFinR = vFinL.clone(); vFinR.rotation.z = 0.6; vFinR.position.x = -0.4;
+            const mainCamF = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.14, 0.2), matRed); mainCamF.position.set(0, 2.7, 0.3);
+            const mainCamB = mainCamF.clone(); mainCamB.position.z = -0.45; g.add(head, faceBase, chin, eyeL, eyeR, antennaCenter, vFinL, vFinR, mainCamF, mainCamB);
+
+            const shoulders = [-1.9, 1.9];
+            shoulders.forEach(xSide => {
+                const shoulder = new THREE.Mesh(new THREE.BoxGeometry(0.9, 1.0, 1.1), matWhite); shoulder.position.set(xSide, 1.2, 0);
+                const joint = new THREE.Mesh(new THREE.SphereGeometry(0.3, 6, 6), matFrame); joint.position.set(xSide, 0.5, 0);
+                const upperArm = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.25, 1.0), matWhite); upperArm.position.set(xSide, 0, 0);
+                const forearm = new THREE.Mesh(new THREE.BoxGeometry(0.5, 1.2, 0.5), matWhite); forearm.position.set(xSide, -0.9, 0); g.add(shoulder, joint, upperArm, forearm);
+            });
+
+            const legs = [-0.65, 0.65];
+            legs.forEach(xSide => {
+                const hipJoint = new THREE.Mesh(new THREE.SphereGeometry(0.35, 6, 6), matFrame); hipJoint.position.set(xSide, -1.2, 0);
+                const thigh = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.3, 1.8), matWhite); thigh.position.set(xSide, -2.1, 0);
+                const knee = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.4, 0.5), matWhite); knee.position.set(xSide, -3.0, 0.1);
+                const calf = new THREE.Mesh(new THREE.BoxGeometry(0.7, 2.0, 0.8), matWhite); calf.position.set(xSide, -4.0, -0.05);
+                const ankle = new THREE.Mesh(new THREE.BoxGeometry(0.75, 0.4, 0.95), matWhite); ankle.position.set(xSide, -5.1, 0);
+                const foot = new THREE.Mesh(new THREE.BoxGeometry(0.85, 0.5, 1.6), matRed); foot.position.set(xSide, -5.4, 0.2); g.add(hipJoint, thigh, knee, calf, ankle, foot);
+            });
+
+            const backpack = new THREE.Mesh(new THREE.BoxGeometry(1.4, 1.5, 0.6), matFrame); backpack.position.set(0, 1.0, -1.1);
+            const saberHiltL = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 1.0), matWhite); saberHiltL.position.set(0.4, 2.0, -1.1); saberHiltL.rotation.x = 0.3;
+            const saberHiltR = saberHiltL.clone(); saberHiltR.position.x = -0.4; g.add(backpack, saberHiltL, saberHiltR);
+
+            const beamBlade = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.05, 13), new THREE.MeshBasicMaterial({color: 0xff11aa}));
+            beamBlade.rotation.x = Math.PI / 2.3; beamBlade.position.set(1.9, -0.9, 6.0); g.add(beamBlade);
+
+            return g;
+        }
+
+        // ==========================================
+        // 🤖 MS-06F ザクⅡ
+        // ==========================================
+        function createAdvancedZaku() {
+            const z = new THREE.Group();
+            const chestBlock = new THREE.Mesh(new THREE.CylinderGeometry(1.3, 1.6, 1.5, 8), matZakuDark); chestBlock.position.y = 1.0; chestBlock.scale.z = 0.8;
+            const centerLine = new THREE.Mesh(new THREE.BoxGeometry(0.2, 1.5, 0.2), matFrame); centerLine.position.set(0, 1.0, 1.3); z.add(chestBlock, centerLine);
+
+            const abs = new THREE.Mesh(new THREE.CylinderGeometry(1.1, 1.3, 1.0, 8), matZakuGreen); abs.position.y = 0;
+            const skirt = new THREE.Mesh(new THREE.CylinderGeometry(1.3, 1.7, 1.1, 8), matZakuGreen); skirt.position.y = -0.9; z.add(abs, skirt);
+
+            const waistPipe = new THREE.Mesh(new THREE.TorusGeometry(1.1, 0.16, 6, 16), matZakuDark); waistPipe.position.y = -0.3; waistPipe.rotation.x = Math.PI/2; z.add(waistPipe);
+
+            const head = new THREE.Mesh(new THREE.SphereGeometry(0.75, 12, 10), matZakuGreen); head.position.y = 2.1; head.scale.y = 0.75;
+            const monoEye = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.18, 0.15, 8), matGlowPink); monoEye.position.set(0, 2.1, 0.65); monoEye.rotateX(Math.PI/2);
+            const mouthSlit = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.3, 0.3), matZakuDark); mouthSlit.position.set(0, 1.8, 0.6);
+            const headAntenna = new THREE.Mesh(new THREE.ConeGeometry(0.06, 0.8, 4), matZakuGreen); headAntenna.position.set(0, 2.7, 0.3); headAntenna.rotation.x = -0.3; z.add(head, monoEye, mouthSlit, headAntenna);
+
+            const headPipe = new THREE.Mesh(new THREE.TorusGeometry(0.42, 0.1, 4, 12, Math.PI), matZakuDark); headPipe.position.set(0, 1.95, 0.3); headPipe.rotation.x = Math.PI/2; z.add(headPipe);
+
+            const shieldArm = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.3, 0.3), matFrame); shieldArm.position.set(1.8, 1.2, 0);
+            const shieldMain = new THREE.Mesh(new THREE.BoxGeometry(0.3, 3.6, 1.4), matZakuGreen); shieldMain.position.set(2.2, 0.6, 0); z.add(shieldArm, shieldMain);
+
+            const spikeBase = new THREE.Mesh(new THREE.SphereGeometry(0.8, 10, 10), matZakuGreen); spikeBase.position.set(-1.8, 1.2, 0); z.add(spikeBase);
+            const spikeAngles = [ [Math.PI/2, 0, 0], [Math.PI/3, 0, Math.PI/4], [Math.PI/3, 0, -Math.PI/4] ];
+            spikeAngles.forEach(ang => {
+                const spike = new THREE.Mesh(new THREE.ConeGeometry(0.18, 0.5, 4), matZakuGreen);
+                spike.position.set(-2.3, 1.5, 0).applyAxisAngle(new THREE.Vector3(0,0,1), ang[2]);
+                spike.lookAt(spikeBase.position); spike.rotateX(Math.PI/2); z.add(spike);
+            });
+
+            const arms = [-1.5, 1.5];
+            arms.forEach(xSide => {
+                if (xSide > 0) return;
+                const forearm = new THREE.Mesh(new THREE.BoxGeometry(0.55, 1.2, 0.55), matZakuGreen); forearm.position.set(xSide, 0, 0.3); forearm.rotation.x = -Math.PI/4; z.add(forearm);
+            });
+
+            const legs = [-0.65, 0.65];
+            legs.forEach(xSide => {
+                const thigh = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.38, 1.7), matZakuGreen); thigh.position.set(xSide, -2.0, 0);
+                const calf = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.65, 2.0, 8), matZakuGreen); calf.position.set(xSide, -3.7, -0.05);
+                const foot = new THREE.Mesh(new THREE.BoxGeometry(0.95, 0.6, 1.7), matZakuDark); foot.position.set(xSide, -4.9, 0.2); z.add(thigh, calf, foot);
+            });
+
+            const pack = new THREE.Mesh(new THREE.BoxGeometry(1.2, 1.4, 0.5), matZakuDark); pack.position.set(0, 0.8, -1.0); z.add(pack);
+
+            const axeHandle = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 4.5), matFrame); axeHandle.position.set(-1.8, 0, 1.8); axeHandle.rotation.x = -Math.PI/5;
+            const axeBlade = new THREE.Mesh(new THREE.BoxGeometry(0.12, 1.5, 0.7), new THREE.MeshBasicMaterial({color: 0xff6600})); axeBlade.position.set(-1.8, 0.9, 2.6); axeBlade.rotation.x = -Math.PI/5; z.add(axeHandle, axeBlade);
+
+            z.userData = { hitRadius: 4.2 };
+            return z;
+        }
+
+        // --- 配置エントリー ---
+        const gundamNet = createAdvancedGundam(); scene.add(gundamNet);
+        const zakuCorps = [];
+        const zakuCount = 15;
+        for (let i = 0; i < zakuCount; i++) {
+            const zk = createAdvancedZaku(); respawnZaku(zk); scene.add(zk); zakuCorps.push(zk);
+        }
+
+        function respawnZaku(zk) {
+            zk.position.set((Math.random() - 0.5) * 200, (Math.random() - 0.5) * 120, -120 - Math.random() * 100);
+            zk.userData.seed = Math.random() * 100;
+            zk.userData.speed = 6.0 + Math.random() * 6.0;
+        }
+
+        // 爆発エフェクト管理
+        const explosions = [];
+        function createExplosion(pos) {
+            const pCount = 45; const geo = new THREE.BufferGeometry(); const positions = new Float32Array(pCount * 3); const velocities = [];
+            for(let i=0; i<pCount; i++) {
+                positions[i*3] = pos.x; positions[i*3+1] = pos.y; positions[i*3+2] = pos.z;
+                velocities.push(new THREE.Vector3((Math.random()-0.5)*40, (Math.random()-0.5)*40, (Math.random()-0.5)*40));
+            }
+            geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            const pSystem = new THREE.Points(geo, new THREE.PointsMaterial({ color: 0xff7722, size: 2.5, transparent: true, opacity: 1.0, blending: THREE.AdditiveBlending }));
+            scene.add(pSystem); explosions.push({ mesh: pSystem, vels: velocities, life: 1.0 });
+        }
+
+        // ==========================================
+        // 🎬 アニメーションループ
+        // ==========================================
+        const clock = new THREE.Clock();
+
+        function animate() {
+            requestAnimationFrame(animate);
+            const delta = clock.getDelta(); const time = clock.getElapsedTime();
+
+            // プレイヤー移動の計算（PC/スマホ共通判定）
+            if (isGameActive) {
+                const dir = new THREE.Vector3(); camera.getWorldDirection(dir);
+                const right = new THREE.Vector3(); right.crossVectors(dir, camera.up).normalize();
+                if (move.forward)  camera.position.addScaledVector(dir, 35.0 * delta);
+                if (move.backward) camera.position.addScaledVector(dir, -35.0 * delta);
+                if (move.left)     camera.position.addScaledVector(right, -35.0 * delta);
+                if (move.right)    camera.position.addScaledVector(right, 35.0 * delta);
+            }
+
+            gundamNet.position.set(Math.sin(time * 0.7) * 45, Math.cos(time * 0.5) * 20, Math.sin(time * 0.5) * 50 - 30);
+            if(zakuCorps.length > 0) gundamNet.lookAt(zakuCorps[0].position);
+
+            zakuCorps.forEach((zk) => {
+                const s = zk.userData.seed;
+                zk.position.x += Math.sin(time * 0.6 + s) * 0.15;
+                zk.position.y += Math.cos(time * 0.4 + s) * 0.10;
+                zk.position.z += zk.userData.speed * delta * 5.0; 
+                if(zk.position.z > camera.position.z + 20) respawnZaku(zk);
+                zk.lookAt(gundamNet.position);
+            });
+
+            // ビーム処理
+            for (let i = playerBeams.length - 1; i >= 0; i--) {
+                const b = playerBeams[i]; b.position.addScaledVector(b.userData.direction, b.userData.speed);
+                let hitRegistered = false;
+
+                for (let j = 0; j < zakuCorps.length; j++) {
+                    const zk = zakuCorps[j];
+                    if (b.position.distanceTo(zk.position) < zk.userData.hitRadius) {
+                        createExplosion(zk.position); respawnZaku(zk);
+                        hitRegistered = true; destroyedCount++; scoreVal.innerText = destroyedCount;
+                        break;
+                    }
+                }
+                if (hitRegistered) {
+                    scene.remove(b); playerBeams.splice(i, 1);
+                    hitUi.style.display = 'block';
+                    setTimeout(() => { hitUi.style.opacity = 0; setTimeout(() => { hitUi.style.display = 'none'; hitUi.style.opacity = 1; }, 100) }, 150);
+                    continue;
+                }
+                if (b.position.distanceTo(camera.position) > 350) { scene.remove(b); playerBeams.splice(i, 1); }
+            }
+
+            // 爆発減衰処理
+            for (let i = explosions.length - 1; i >= 0; i--) {
+                const exp = explosions[i]; exp.life -= delta * 1.6;
+                const arr = exp.mesh.geometry.attributes.position.array;
+                for(let j=0; j<45; j++) {
+                    arr[j*3] += exp.vels[j].x * delta; arr[j*3+1] += exp.vels[j].y * delta; arr[j*3+2] += exp.vels[j].z * delta;
+                }
+                exp.mesh.geometry.attributes.position.needsUpdate = true; exp.mesh.material.opacity = exp.life;
+                if (exp.life <= 0) { scene.remove(exp.mesh); explosions.splice(i, 1); }
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        animate();
+
+        // 画面リサイズ対応
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / (window.innerHeight * 0.7); camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight * 0.7);
+        });
+    </script>
+</body>
+</html>
