@@ -2,13 +2,13 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <link rel="stylesheet" href="style.css">
     <title>Space Skirmish: Cross-Platform Masterpiece</title>
 
     <style>
         /* ========================================================
-           ✨ 画面レイアウトの最適化
+           ✨ 画面レイアウトの最適化（iPhoneバー対策）
            ======================================================== */
         html, body {
             margin: 0; padding: 0; 
@@ -18,13 +18,22 @@
             user-select: none; -webkit-user-select: none;
         }
 
+        /* ゲーム画面の外枠を安定化 */
+        #game-wrapper {
+            position: relative;
+            width: 100%;
+            height: 70vh;
+            background: #000;
+            overflow: hidden;
+        }
+
         #canvas-container { 
-            position: relative; width: 100%; height: 70vh; 
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             z-index: 1; touch-action: none;
         }
 
         #instructions {
-            position: absolute; top: 0; left: 0; width: 100%; height: 70vh;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.85);
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             color: #00ffff; z-index: 20; cursor: pointer; text-align: center;
@@ -34,12 +43,13 @@
         #instructions p { font-size: 0.95rem; color: #fff; margin: 5px; }
 
         #hud-container {
-            position: absolute; top: 0; left: 0; width: 100%; height: 70vh;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             z-index: 10; pointer-events: none; box-sizing: border-box;
             border: 2px solid #00ffff; box-shadow: inset 0 0 100px rgba(0, 253, 255, 0.15);
             display: none;
         }
 
+        /* 💡 照準（レティクル）を外枠に対して完全に「絶対中央」に固定 */
         .reticle {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
             width: 40px; height: 40px; border: 2px solid #00ffff; border-radius: 50%;
@@ -67,7 +77,7 @@
             font-size: 1rem; text-shadow: 0 0 5px #00ffff;
         }
 
-        /* 📱 スマホ用バーチャルパッド（位置と重なり順を完全固定） */
+        /* スマホ用コントローラー */
         #mobile-controls {
             display: none; position: absolute; bottom: 5%; left: 0; width: 100%; height: 130px;
             z-index: 25; pointer-events: none;
@@ -113,7 +123,7 @@
 
 <body>
 
-    <div style="position: relative; width: 100%; height: 70vh; background:#000;">
+    <div id="game-wrapper">
         <button id="btn-exit">❌ QUIT GAME</button>
 
         <div id="instructions">
@@ -128,7 +138,7 @@
             <div class="reticle"></div>
             <div class="hit-indicator" id="hit-ui">HIT</div>
             <div class="score-board">💥 DESTRUCTED: <span id="score-val">0</span></div>
-            <div class="weapon-status">🤖 MOBILE SIMULATION SYSTEM V3.6</div>
+            <div class="weapon-status">🤖 MOBILE SIMULATION SYSTEM V3.7 (iOS Optimized)</div>
         </div>
 
         <div id="mobile-controls">
@@ -165,19 +175,23 @@
         const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
         // --- 基本設定 ---
+        const wrapper = document.getElementById('game-wrapper');
         const container = document.getElementById('canvas-container');
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(0x000003);
         scene.fog = new THREE.FogExp2(0x000003, 0.0035);
 
-        const camera = new THREE.PerspectiveCamera(65, window.innerWidth / (window.innerHeight * 0.7), 0.1, 1000);
+        // 💡 実測ピクセルに基づいてアスペクト比を計算
+        let viewWidth = wrapper.clientWidth;
+        let viewHeight = wrapper.clientHeight;
+
+        const camera = new THREE.PerspectiveCamera(65, viewWidth / viewHeight, 0.1, 1000);
         camera.position.set(0, 0, 60);
 
-        // 💡【安全対策】Eulerを使ってカメラの回転を安全に直接制御
         const cameraEuler = new THREE.Euler(0, 0, 0, 'YXZ');
 
         const renderer = new THREE.WebGLRenderer({ antialias: true });
-        renderer.setSize(window.innerWidth, window.innerHeight * 0.7);
+        renderer.setSize(viewWidth, viewHeight);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         container.appendChild(renderer.domElement);
 
@@ -206,6 +220,7 @@
             window.scrollTo(0, 0);
             document.body.style.overflow = 'hidden';
             document.documentElement.style.overflow = 'hidden';
+            updateSizes();
         }
 
         function deactivateGame() {
@@ -222,7 +237,7 @@
         instructions.addEventListener('click', activateGame);
         btnExit.addEventListener('click', (e) => { e.stopPropagation(); deactivateGame(); });
 
-        // --- 🕹️ 安全設計・視点移動（ドラッグ＆スワイプ） ---
+        // --- 🕹️ iPhone完全対応：視点移動システム ---
         let isPointerDown = false;
         let previousPointerPosition = { x: 0, y: 0 };
 
@@ -238,12 +253,10 @@
             const deltaX = e.clientX - previousPointerPosition.x;
             const deltaY = e.clientY - previousPointerPosition.y;
 
-            // 💡【フリーズ対策】Euler（オイラー角）を直接加算。NaNクラッシュを100%防止
-            const speedMultiplier = 0.0035;
-            cameraEuler.y -= deltaX * speedMultiplier;
-            cameraEuler.x -= deltaY * speedMultiplier;
+            // 💡 画面の縦幅ピクセルを動的に割り算に使うことで、iPhone14でも完全にズレを除去
+            cameraEuler.y -= (deltaX / viewWidth) * 2.2;
+            cameraEuler.x -= (deltaY / viewHeight) * 2.2;
 
-            // 限界角度をロック
             cameraEuler.x = Math.max(-Math.PI / 2.2, Math.min(Math.PI / 2.2, cameraEuler.x));
             camera.quaternion.setFromEuler(cameraEuler);
 
@@ -264,7 +277,7 @@
             if (e.code === 'KeyA') move.left = false;    if (e.code === 'KeyD') move.right = false;
         });
 
-        // --- 📱 スマホ移動（バブリング完全防止版） ---
+        // --- 📱 スマホ移動 ---
         function setupMobileBtn(id, property) {
             const btn = document.getElementById(id);
             btn.addEventListener('touchstart', (e) => { 
@@ -426,7 +439,7 @@
 
         function animate() {
             requestAnimationFrame(animate);
-            const delta = Math.min(clock.getDelta(), 0.1); // スパイク遅延での強制停止を防止
+            const delta = Math.min(clock.getDelta(), 0.1); 
             const time = clock.getElapsedTime();
 
             if (isGameActive) {
@@ -479,10 +492,20 @@
 
         animate();
 
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / (window.innerHeight * 0.7); camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight * 0.7);
-        });
+        // 💡 iPhone14のバー伸縮を完全にシャットアウトするサイズ更新処理
+        function updateSizes() {
+            viewWidth = wrapper.clientWidth;
+            viewHeight = wrapper.clientHeight;
+            camera.aspect = viewWidth / viewHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(viewWidth, viewHeight);
+        }
+
+        window.addEventListener('resize', updateSizes);
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener('resize', updateSizes);
+            window.visualViewport.addEventListener('scroll', updateSizes);
+        }
     </script>
 </body>
 </html>
