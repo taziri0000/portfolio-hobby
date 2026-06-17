@@ -1,106 +1,282 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <link rel="stylesheet" href="style.css">
     <title>Space Skirmish: GP02 True Forward Saber Fixed</title>
 
     <style>
-        html, body {
-            margin: 0; padding: 0; 
-            overflow-y: auto; overflow-x: hidden;
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            overflow-y: auto;
+            overflow-x: hidden;
             background-color: #000;
             font-family: 'Courier New', Courier, monospace;
-            user-select: none; -webkit-user-select: none;
+            user-select: none;
+            -webkit-user-select: none;
         }
 
         #game-wrapper {
-            position: relative; width: 100%; height: 70vh; background: #000; overflow: hidden;
+            position: relative;
+            width: 100%;
+            height: 70vh;
+            background: #000;
+            overflow: hidden;
         }
 
-        #canvas-container { 
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; touch-action: none;
+        #canvas-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            touch-action: none;
         }
 
         #instructions {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85);
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            color: #00ffaa; z-index: 20; cursor: pointer; text-align: center; padding: 0 10px; box-sizing: border-box;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #00ffaa;
+            z-index: 20;
+            cursor: pointer;
+            text-align: center;
+            padding: 0 10px;
+            box-sizing: border-box;
         }
-        #instructions h1 { font-size: 1.8rem; text-shadow: 0 0 12px #00ffaa; margin-bottom: 5px; }
-        #instructions p { font-size: 0.95rem; color: #fff; margin: 5px; }
+
+        #instructions h1 {
+            font-size: 1.8rem;
+            text-shadow: 0 0 12px #00ffaa;
+            margin-bottom: 5px;
+        }
+
+        #instructions p {
+            font-size: 0.95rem;
+            color: #fff;
+            margin: 5px;
+        }
 
         #hud-container {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 10; pointer-events: none; box-sizing: border-box;
-            border: 2px solid #00ffff; box-shadow: inset 0 0 100px rgba(0, 253, 255, 0.1); display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            pointer-events: none;
+            box-sizing: border-box;
+            border: 2px solid #00ffff;
+            box-shadow: inset 0 0 100px rgba(0, 253, 255, 0.1);
+            display: none;
         }
 
         .reticle {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 40px; height: 40px; border: 2px solid #00ffff; border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            border: 2px solid #00ffff;
+            border-radius: 50%;
         }
-        .reticle::before, .reticle::after { content: ''; position: absolute; background: #00ffff; }
-        .reticle::before { top: 19px; left: -12px; width: 12px; height: 2px; }
-        .reticle::after { top: 19px; right: -12px; width: 12px; height: 2px; }
+
+        .reticle::before,
+        .reticle::after {
+            content: '';
+            position: absolute;
+            background: #00ffff;
+        }
+
+        .reticle::before {
+            top: 19px;
+            left: -12px;
+            width: 12px;
+            height: 2px;
+        }
+
+        .reticle::after {
+            top: 19px;
+            right: -12px;
+            width: 12px;
+            height: 2px;
+        }
 
         .weapon-status {
-            position: absolute; bottom: 4%; left: 50%; transform: translateX(-50%);
-            color: #00ffaa; font-size: 0.8rem; font-weight: bold;
-            background: rgba(0,25,15,0.85); padding: 5px 15px; border: 1px solid #00ffaa;
-            text-shadow: 0 0 5px #00ffaa; white-space: nowrap;
+            position: absolute;
+            bottom: 4%;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #00ffaa;
+            font-size: 0.8rem;
+            font-weight: bold;
+            background: rgba(0, 25, 15, 0.85);
+            padding: 5px 15px;
+            border: 1px solid #00ffaa;
+            text-shadow: 0 0 5px #00ffaa;
+            white-space: nowrap;
         }
 
         .hit-indicator {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 60px; height: 60px; border: 2px solid #ff3333; border-radius: 50%;
-            display: none; color: #ff3333; font-weight: bold; text-align: center; line-height: 60px;
-            text-shadow: 0 0 8px #ff3333; box-shadow: 0 0 10px #ff3333;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            border: 2px solid #ff3333;
+            border-radius: 50%;
+            display: none;
+            color: #ff3333;
+            font-weight: bold;
+            text-align: center;
+            line-height: 60px;
+            text-shadow: 0 0 8px #ff3333;
+            box-shadow: 0 0 10px #ff3333;
         }
 
         .score-board {
-            position: absolute; top: 4%; right: 4%; color: #00ffff; font-weight: bold;
-            font-size: 1rem; text-shadow: 0 0 5px #00ffff;
+            position: absolute;
+            top: 4%;
+            right: 4%;
+            color: #00ffff;
+            font-weight: bold;
+            font-size: 1rem;
+            text-shadow: 0 0 5px #00ffff;
         }
 
         #mobile-controls {
-            display: none; position: absolute; bottom: 5%; left: 0; width: 100%; height: 130px; z-index: 25; pointer-events: none;
+            display: none;
+            position: absolute;
+            bottom: 5%;
+            left: 0;
+            width: 100%;
+            height: 130px;
+            z-index: 25;
+            pointer-events: none;
         }
+
         .btn-move-pad {
-            position: absolute; left: 6%; bottom: 10px; width: 110px; height: 110px; pointer-events: auto;
+            position: absolute;
+            left: 6%;
+            bottom: 10px;
+            width: 110px;
+            height: 110px;
+            pointer-events: auto;
         }
+
         .m-btn {
-            position: absolute; width: 36px; height: 36px; background: rgba(0, 253, 255, 0.25);
-            border: 1px solid #00ffff; color: #00ffff; text-align: center; line-height: 34px;
-            font-size: 0.9rem; font-weight: bold; border-radius: 6px;
+            position: absolute;
+            width: 36px;
+            height: 36px;
+            background: rgba(0, 253, 255, 0.25);
+            border: 1px solid #00ffff;
+            color: #00ffff;
+            text-align: center;
+            line-height: 34px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            border-radius: 6px;
         }
-        .m-btn:active { background: rgba(0, 253, 255, 0.7); color: #000; }
-        #btn-w { top: 0; left: 37px; }
-        #btn-s { bottom: 0; left: 37px; }
-        #btn-a { top: 37px; left: 0; }
-        #btn-d { top: 37px; right: 0; }
+
+        .m-btn:active {
+            background: rgba(0, 253, 255, 0.7);
+            color: #000;
+        }
+
+        #btn-w {
+            top: 0;
+            left: 37px;
+        }
+
+        #btn-s {
+            bottom: 0;
+            left: 37px;
+        }
+
+        #btn-a {
+            top: 37px;
+            left: 0;
+        }
+
+        #btn-d {
+            top: 37px;
+            right: 0;
+        }
 
         #btn-fire {
-            position: absolute; right: 8%; bottom: 15px; width: 75px; height: 75px;
-            background: rgba(255, 50, 50, 0.3); border: 2px solid #ff3333; border-radius: 50%;
-            color: #ff3333; font-weight: bold; text-align: center; line-height: 71px;
-            font-size: 1.1rem; pointer-events: auto; text-shadow: 0 0 5px #ff3333; box-shadow: 0 0 10px rgba(255,50,50,0.2);
+            position: absolute;
+            right: 8%;
+            bottom: 15px;
+            width: 75px;
+            height: 75px;
+            background: rgba(255, 50, 50, 0.3);
+            border: 2px solid #ff3333;
+            border-radius: 50%;
+            color: #ff3333;
+            font-weight: bold;
+            text-align: center;
+            line-height: 71px;
+            font-size: 1.1rem;
+            pointer-events: auto;
+            text-shadow: 0 0 5px #ff3333;
+            box-shadow: 0 0 10px rgba(255, 50, 50, 0.2);
         }
-        #btn-fire:active { background: rgba(255, 50, 50, 0.8); color: #fff; }
+
+        #btn-fire:active {
+            background: rgba(255, 50, 50, 0.8);
+            color: #fff;
+        }
 
         #btn-exit {
-            position: absolute; top: 4%; left: 4%; padding: 6px 12px;
-            background: rgba(255,255,255,0.1); border: 1px solid #fff; color: #fff;
-            font-size: 0.8rem; border-radius: 4px; pointer-events: auto; display: none; z-index: 26;
+            position: absolute;
+            top: 4%;
+            left: 4%;
+            padding: 6px 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid #fff;
+            color: #fff;
+            font-size: 0.8rem;
+            border-radius: 4px;
+            pointer-events: auto;
+            display: none;
+            z-index: 26;
         }
 
         .article-section {
-            position: relative; z-index: 30; background-color: #0b0f19; color: #ffffff; padding: 40px 20px; min-height: 100vh; 
+            position: relative;
+            z-index: 30;
+            background-color: #0b0f19;
+            color: #ffffff;
+            padding: 40px 20px;
+            min-height: 100vh;
         }
-        .article-container { max-width: 800px; margin: 0 auto; }
-        .article-section h2 { color: #00ffff; border-bottom: 2px solid #00ffff; padding-bottom: 10px; font-size: 1.6rem; }
+
+        .article-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .article-section h2 {
+            color: #00ffff;
+            border-bottom: 2px solid #00ffff;
+            padding-bottom: 10px;
+            font-size: 1.6rem;
+        }
     </style>
 </head>
 
@@ -138,11 +314,17 @@
         <div class="article-container">
             <h2>趣味の置き場所</h2>
             <p style="line-height: 1.8; color: #ccc; font-size: 1.05rem;">
-                一応ポートフォリオですが、趣味であるプラモデルとその関連の情報をアップしていきます。ガンダム試作2号機（GP02A）の特徴である黄緑色のハイパー・ビーム・サーベルの光跡をWebグラフィックスで情緒的に演出しています。
+                一応ポートフォリオですが、趣味であるプラモデルとその関連の情報をアップしていきます。
             </p>
+            <a href="note.html">ガンプラ作品集</a>
         </div>
     </div>
-
+    <div class="note">
+        <h2>今日は6月17日</h2><br>
+        <p>一昨日は1/144 HTE Oの再販日でしたが家電量販店やホビーショップでもその姿を見かけることは無かったですがやっとヨドバシでゲット。<br>中身はこんなんでした。</p>
+        <img src="images/名称未設定のデザイン.jpg" alt="THE O開封画像">
+        <img src="images/the o2.jpg" alt="THE O開封画像2">
+    </div>
     <script type="importmap">
         {
             "imports": {
@@ -166,7 +348,7 @@
         let viewHeight = wrapper.clientHeight;
 
         const camera = new THREE.PerspectiveCamera(65, viewWidth / viewHeight, 0.1, 1000);
-        camera.position.set(0, 8, 75); 
+        camera.position.set(0, 8, 75);
         const cameraEuler = new THREE.Euler(0, 0, 0, 'YXZ');
 
         const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -192,7 +374,7 @@
             instructions.style.display = 'none';
             hud.style.display = 'block';
             btnExit.style.display = 'block';
-            if(isTouchDevice) mobileControls.style.display = 'block';
+            if (isTouchDevice) mobileControls.style.display = 'block';
             window.scrollTo(0, 0);
             document.body.style.overflow = 'hidden';
             document.documentElement.style.overflow = 'hidden';
@@ -238,19 +420,19 @@
 
         const move = { forward: false, backward: false, left: false, right: false };
         window.addEventListener('keydown', (e) => {
-            if(!isGameActive) return;
+            if (!isGameActive) return;
             if (e.code === 'KeyW') move.forward = true; if (e.code === 'KeyS') move.backward = true;
-            if (e.code === 'KeyA') move.left = true;    if (e.code === 'KeyD') move.right = true;
+            if (e.code === 'KeyA') move.left = true; if (e.code === 'KeyD') move.right = true;
         });
         window.addEventListener('keyup', (e) => {
             if (e.code === 'KeyW') move.forward = false; if (e.code === 'KeyS') move.backward = false;
-            if (e.code === 'KeyA') move.left = false;    if (e.code === 'KeyD') move.right = false;
+            if (e.code === 'KeyA') move.left = false; if (e.code === 'KeyD') move.right = false;
         });
 
         function setupMobileBtn(id, property) {
             const btn = document.getElementById(id);
-            btn.addEventListener('touchstart', (e) => { e.preventDefault(); e.stopPropagation(); move[property] = true; }, {passive: false});
-            btn.addEventListener('touchend', (e) => { e.preventDefault(); e.stopPropagation(); move[property] = false; }, {passive: false});
+            btn.addEventListener('touchstart', (e) => { e.preventDefault(); e.stopPropagation(); move[property] = true; }, { passive: false });
+            btn.addEventListener('touchend', (e) => { e.preventDefault(); e.stopPropagation(); move[property] = false; }, { passive: false });
         }
         setupMobileBtn('btn-w', 'forward');
         setupMobileBtn('btn-s', 'backward');
@@ -270,13 +452,13 @@
             scene.add(beamMesh); playerBeams.push(beamMesh);
         }
 
-        container.addEventListener('click', (e) => { if(!isTouchDevice) fireBeam(); });
-        document.getElementById('btn-fire').addEventListener('touchstart', (e) => { e.preventDefault(); e.stopPropagation(); fireBeam(); }, {passive: false});
+        container.addEventListener('click', (e) => { if (!isTouchDevice) fireBeam(); });
+        document.getElementById('btn-fire').addEventListener('touchstart', (e) => { e.preventDefault(); e.stopPropagation(); fireBeam(); }, { passive: false });
 
         // 宇宙の星
         const starsGeometry = new THREE.BufferGeometry();
         const starPositions = new Float32Array(2000 * 3);
-        for(let i = 0; i < 2000 * 3; i++) starPositions[i] = (Math.random() - 0.5) * 700;
+        for (let i = 0; i < 2000 * 3; i++) starPositions[i] = (Math.random() - 0.5) * 700;
         starsGeometry.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
         scene.add(new THREE.Points(starsGeometry, new THREE.PointsMaterial({ color: 0xffffff, size: 0.6 })));
 
@@ -289,7 +471,7 @@
         const matZakuDark = new THREE.MeshStandardMaterial({ color: 0x243624, roughness: 0.5 });
         const matFrame = new THREE.MeshStandardMaterial({ color: 0x333333, roughness: 0.5, metalness: 0.7 });
         const matGlowPink = new THREE.MeshBasicMaterial({ color: 0xff2277 });
-        
+
         // GP02専用マテリアル
         const matGP02Base = new THREE.MeshStandardMaterial({ color: 0xe5e9f0, roughness: 0.5, metalness: 0.1 });
         const matGP02Blue = new THREE.MeshStandardMaterial({ color: 0x0d1f44, roughness: 0.45, metalness: 0.1 });
@@ -318,7 +500,7 @@
                 const calf = new THREE.Mesh(new THREE.BoxGeometry(0.7, 2.0, 0.8), matWhite); calf.position.set(xSide, -4.0, -0.05); g.add(thigh, calf);
             });
             // ガンダムのビームサーベル（ピンク・前向き）
-            const beamBlade = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.05, 13), new THREE.MeshBasicMaterial({color: 0xff11aa}));
+            const beamBlade = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.05, 13), new THREE.MeshBasicMaterial({ color: 0xff11aa }));
             beamBlade.rotation.x = Math.PI / 2.3; beamBlade.position.set(1.9, -0.9, 6.0); g.add(beamBlade);
             return g;
         }
@@ -330,7 +512,7 @@
             const abs = new THREE.Mesh(new THREE.CylinderGeometry(1.1, 1.3, 1.0, 8), matZakuGreen); abs.position.y = 0;
             const skirt = new THREE.Mesh(new THREE.CylinderGeometry(1.3, 1.7, 1.1, 8), matZakuGreen); skirt.position.y = -0.9; z.add(chestBlock, abs, skirt);
             const head = new THREE.Mesh(new THREE.SphereGeometry(0.75, 12, 10), matZakuGreen); head.position.y = 2.1; head.scale.y = 0.75;
-            const monoEye = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.18, 0.15, 8), matGlowPink); monoEye.position.set(0, 2.1, 0.65); monoEye.rotateX(Math.PI/2); z.add(head, monoEye);
+            const monoEye = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.18, 0.15, 8), matGlowPink); monoEye.position.set(0, 2.1, 0.65); monoEye.rotateX(Math.PI / 2); z.add(head, monoEye);
             const shieldMain = new THREE.Mesh(new THREE.BoxGeometry(0.3, 3.6, 1.4), matZakuGreen); shieldMain.position.set(2.2, 0.6, 0); z.add(shieldMain);
             const legs = [-0.65, 0.65];
             legs.forEach(xSide => {
@@ -349,7 +531,7 @@
             const cockpitCowl = new THREE.Mesh(new THREE.BoxGeometry(1.4, 1.4, 1.2), matRed); cockpitCowl.position.set(0, 0.8, 1.6);
             const abs = new THREE.Mesh(new THREE.BoxGeometry(2.6, 1.1, 2.6), matGP02Base); abs.position.y = -0.3;
             const waist = new THREE.Mesh(new THREE.BoxGeometry(3.7, 1.2, 3.0), matGP02Base); waist.position.y = -1.2;
-            
+
             const frontSkirtL = new THREE.Mesh(new THREE.BoxGeometry(1.7, 2.0, 0.6), matGP02Base); frontSkirtL.position.set(0.95, -2.0, 1.5); frontSkirtL.rotation.x = 0.25; frontSkirtL.rotation.y = -0.12;
             const frontSkirtR = frontSkirtL.clone(); frontSkirtR.position.x = -0.95; frontSkirtR.rotation.y = 0.12;
             gp02.add(chest, cockpitCowl, abs, waist, frontSkirtL, frontSkirtR);
@@ -361,11 +543,11 @@
             // 2. 悪役頭部
             const headGroup = new THREE.Group(); headGroup.position.y = 2.5;
             const head = new THREE.Mesh(new THREE.BoxGeometry(1.1, 1.1, 1.2), matGP02Base);
-            const faceGuard = new THREE.Mesh(new THREE.BoxGeometry(0.85, 0.65, 0.45), matGP02Base); faceGuard.position.set(0, -0.2, 0.5); 
+            const faceGuard = new THREE.Mesh(new THREE.BoxGeometry(0.85, 0.65, 0.45), matGP02Base); faceGuard.position.set(0, -0.2, 0.5);
             const chinRed = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.45, 0.35), matRed); chinRed.position.set(0, -0.45, 0.7);
             const mainVFinL = new THREE.Mesh(new THREE.ConeGeometry(0.09, 1.9, 4), matYellow); mainVFinL.rotation.z = -0.7; mainVFinL.position.set(0.4, 1.0, 0.4);
             const mainVFinR = mainVFinL.clone(); mainVFinR.rotation.z = 0.7; mainVFinR.position.x = -0.4;
-            
+
             const mainCamera = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.2, 0.2), matGP02GreenGlow); mainCamera.position.set(0, 0.6, 0.6);
             const vulcanL = new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.55, 0.9), matFrame); vulcanL.position.set(0.68, 0.1, 0.1);
             const vulcanR = vulcanL.clone(); vulcanR.position.x = -0.68;
@@ -384,7 +566,7 @@
                 const blueCowl = new THREE.Mesh(new THREE.BoxGeometry(2.5, 3.8, 1.2), matGP02Blue); blueCowl.position.set(0.6 * side, 0.7, 1.2); binderGroup.add(blueCowl);
                 const heatFin = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.2, 2.0), matYellow); heatFin.position.set(0.5 * side, 2.2, 0); binderGroup.add(heatFin);
 
-                for(let k = -1; k <= 1; k++) {
+                for (let k = -1; k <= 1; k++) {
                     const vernierOuter = new THREE.Mesh(new THREE.CylinderGeometry(0.48, 0.68, 1.0, 12), matFrame);
                     vernierOuter.position.set(0.5 * side, -2.9, k * 0.8);
                     const vernierInner = new THREE.Mesh(new THREE.CylinderGeometry(0.38, 0.52, 0.1, 12), matGP02GreenGlow);
@@ -400,27 +582,27 @@
             // 腕自体をガンダムと鏡像（対称）かつ、真っ直ぐ前に突き出す構造に全面改修しました。
             const rightArmGroup = new THREE.Group(); rightArmGroup.position.set(-2.2, 1.2, 0);
             const shoulderR = new THREE.Mesh(new THREE.BoxGeometry(1.3, 1.3, 1.3), matGP02Base); rightArmGroup.add(shoulderR);
-            
+
             // 下を向いていた原因である前腕のZ軸/X軸の初期ダウンスロープ回転を除去し、前方をダイレクトにロック。
-            const forearmR = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.7, 1.6), matGP02Base); 
-            forearmR.position.set(-0.3, -0.2, 1.0); 
+            const forearmR = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.7, 1.6), matGP02Base);
+            forearmR.position.set(-0.3, -0.2, 1.0);
             rightArmGroup.add(forearmR);
-            
+
             // サーベルを手に持ち、ガンダム(Math.PI / 2.3)と同じベクトルかつ前方(Zプラス方向)へ向けた完璧なレイアウト。
-            const saberGroup = new THREE.Group(); 
+            const saberGroup = new THREE.Group();
             saberGroup.position.set(-0.3, -0.2, 1.8);
-            
-            const saberHilt = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.22, 1.6, 12), matFrame); 
+
+            const saberHilt = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.22, 1.6, 12), matFrame);
             // X軸を傾けて、前方に刀身を突き出すガンダムと同期する回転角に固定
-            saberHilt.rotation.x = Math.PI / 2.3; 
+            saberHilt.rotation.x = Math.PI / 2.3;
             saberGroup.add(saberHilt);
-            
+
             // 🟩 黄緑色の高出力ビーム刃（グリップの先端から真っ直ぐ前方に放射）
             const hyperBlade = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.08, 15, 12), matHyperSaberGlow);
             // Cylinderのローカル中心をオフセットして前方に長く伸びるように配置
-            hyperBlade.position.set(0, 7.5, 0); 
+            hyperBlade.position.set(0, 7.5, 0);
             saberHilt.add(hyperBlade);
-            
+
             rightArmGroup.add(saberGroup);
             gp02.add(rightArmGroup);
 
@@ -445,12 +627,12 @@
             legs.forEach(xSide => {
                 const thigh = new THREE.Mesh(new THREE.BoxGeometry(1.15, 2.5, 1.35), matGP02Base); thigh.position.set(xSide, -2.5, 0);
                 const massiveCalf = new THREE.Mesh(new THREE.BoxGeometry(2.1, 3.7, 2.5), matGP02Base); massiveCalf.position.set(xSide, -4.7, -0.2);
-                const sideVernier = new THREE.Mesh(new THREE.BoxGeometry(0.75, 1.8, 1.45), matGP02Blue); sideVernier.position.set(xSide + (1.05*xSide), -4.7, -0.2);
+                const sideVernier = new THREE.Mesh(new THREE.BoxGeometry(0.75, 1.8, 1.45), matGP02Blue); sideVernier.position.set(xSide + (1.05 * xSide), -4.7, -0.2);
                 gp02.add(thigh, massiveCalf, sideVernier);
             });
 
             gp02.scale.set(1.3, 1.3, 1.3);
-            gp02.userData = { isGP02: true }; 
+            gp02.userData = { isGP02: true };
             return gp02;
         }
 
@@ -471,11 +653,11 @@
         // 爆発処理
         const explosions = [];
         function createExplosion(pos) {
-            const pCount = 30; 
+            const pCount = 30;
             const geo = new THREE.BufferGeometry(); const positions = new Float32Array(pCount * 3); const velocities = [];
-            for(let i=0; i<pCount; i++) {
-                positions[i*3] = pos.x; positions[i*3+1] = pos.y; positions[i*3+2] = pos.z;
-                velocities.push(new THREE.Vector3((Math.random()-0.5)*35, (Math.random()-0.5)*35, (Math.random()-0.5)*35));
+            for (let i = 0; i < pCount; i++) {
+                positions[i * 3] = pos.x; positions[i * 3 + 1] = pos.y; positions[i * 3 + 2] = pos.z;
+                velocities.push(new THREE.Vector3((Math.random() - 0.5) * 35, (Math.random() - 0.5) * 35, (Math.random() - 0.5) * 35));
             }
             geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
             const pSystem = new THREE.Points(geo, new THREE.PointsMaterial({ color: 0xff6611, size: 2.5, transparent: true, opacity: 1.0, blending: THREE.AdditiveBlending }));
@@ -487,16 +669,16 @@
 
         function animate() {
             requestAnimationFrame(animate);
-            const delta = Math.min(clock.getDelta(), 0.1); 
+            const delta = Math.min(clock.getDelta(), 0.1);
             const time = clock.getElapsedTime();
 
             if (isGameActive) {
                 const dir = new THREE.Vector3(); camera.getWorldDirection(dir);
                 const right = new THREE.Vector3(); right.crossVectors(dir, camera.up).normalize();
-                if (move.forward)  camera.position.addScaledVector(dir, 35.0 * delta);
+                if (move.forward) camera.position.addScaledVector(dir, 35.0 * delta);
                 if (move.backward) camera.position.addScaledVector(dir, -35.0 * delta);
-                if (move.left)     camera.position.addScaledVector(right, -35.0 * delta);
-                if (move.right)    camera.position.addScaledVector(right, 35.0 * delta);
+                if (move.left) camera.position.addScaledVector(right, -35.0 * delta);
+                if (move.right) camera.position.addScaledVector(right, 35.0 * delta);
             }
 
             // ガンダムの軌道
@@ -506,10 +688,10 @@
             gundamNet.position.set(gunX, gunY, gunZ);
 
             // GP02をガンダムと同期
-            const gp02TargetX = gunX + 26.0 + Math.sin(time * 1.5) * 4; 
+            const gp02TargetX = gunX + 26.0 + Math.sin(time * 1.5) * 4;
             const gp02TargetY = gunY + Math.cos(time * 1.2) * 3;
             const gp02TargetZ = gunZ + Math.cos(time * 0.8) * 6 - 3;
-            
+
             gp02Unit.position.x += (gp02TargetX - gp02Unit.position.x) * 0.08;
             gp02Unit.position.y += (gp02TargetY - gp02Unit.position.y) * 0.08;
             gp02Unit.position.z += (gp02TargetZ - gp02Unit.position.z) * 0.08;
@@ -523,7 +705,7 @@
             const bR = gp02Unit.getObjectByName("binder_R");
             if (bL && bR) {
                 bL.rotation.y = -0.35 + Math.sin(time * 4.5) * 0.15;
-                bR.rotation.y =  0.35 + Math.cos(time * 4.5) * 0.15;
+                bR.rotation.y = 0.35 + Math.cos(time * 4.5) * 0.15;
                 bL.rotation.x = Math.sin(time * 6.0) * 0.08;
                 bR.rotation.x = Math.sin(time * 6.0) * 0.08;
             }
@@ -531,8 +713,8 @@
             // ザクの侵攻
             zakuCorps.forEach((zk) => {
                 const s = zk.userData.seed;
-                zk.position.x += Math.sin(time * 0.6 + s) * 0.15; zk.position.y += Math.cos(time * 0.4 + s) * 0.10; zk.position.z += zk.userData.speed * delta * 5.0; 
-                if(zk.position.z > camera.position.z + 20) respawnZaku(zk);
+                zk.position.x += Math.sin(time * 0.6 + s) * 0.15; zk.position.y += Math.cos(time * 0.4 + s) * 0.10; zk.position.z += zk.userData.speed * delta * 5.0;
+                if (zk.position.z > camera.position.z + 20) respawnZaku(zk);
                 zk.lookAt(gundamNet.position);
             });
 
@@ -563,7 +745,7 @@
                 const exp = explosions[i]; exp.life -= delta * 1.2;
                 const arr = exp.mesh.geometry.attributes.position.array;
                 const pAmt = arr.length / 3;
-                for(let j=0; j<pAmt; j++) { arr[j*3] += exp.vels[j].x * delta; arr[j*3+1] += exp.vels[j].y * delta; arr[j*3+2] += exp.vels[j].z * delta; }
+                for (let j = 0; j < pAmt; j++) { arr[j * 3] += exp.vels[j].x * delta; arr[j * 3 + 1] += exp.vels[j].y * delta; arr[j * 3 + 2] += exp.vels[j].z * delta; }
                 exp.mesh.geometry.attributes.position.needsUpdate = true; exp.mesh.material.opacity = Math.max(0, exp.life);
                 if (exp.life <= 0) { scene.remove(exp.mesh); explosions.splice(i, 1); }
             }
@@ -586,4 +768,5 @@
         }
     </script>
 </body>
+
 </html>
