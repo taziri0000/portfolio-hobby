@@ -71,10 +71,15 @@
         }
         .article-section a{
             position: fixed;
-            top: 2vh;
-            right: 10vw;
+            top: 10vh;
+            right: 5vw;
             font-size: 4vw;
-            
+            text-decoration: none;
+        }
+
+        .article-section a:hover{
+            font-size: 6vw;
+            color: #fff;
         }
 
 
@@ -83,6 +88,9 @@
             position: fixed;
             top: 5vh;
             right: 5vw;
+            text-decoration: none;
+
+            
         }
 
         .return a:hover{
@@ -108,5 +116,13 @@
             display: block;
             width: 80%;
             margin: 0 auto;
+        }
+
+        .title h1{
+            display: block;
+            height: 10vh;
+            font-size: 6vw;
+            color: #fff;
+            text-align: center;
         }
 
