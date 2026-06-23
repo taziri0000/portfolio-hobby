@@ -34,15 +34,21 @@
         .back-link {
             display: inline-block;
             color: var(--accent);
+            position: fixed;
+            top: 3vh;
+            left: 3vw;
+            font-size: 3vw;
             text-shadow: #fff 1px 1px 1px;
             text-decoration: none;
             margin-bottom: 20px;
-            border-bottom: 1px solid var(--accent2);
+            border: 1px solid var(--text);
+            z-index: 555;
 
         }
 
         .back-link:hover {
-            font-size: 3vw;
+            background-color: yellow;
+            color: var(--bg);
             transition: 0.5s;
         }
 
@@ -102,7 +108,7 @@
 <body>
 
     <div class="container">
-        <a href="index.html" class="back-link">← ホームへ戻る</a>
+        <a href="index.html" class="back-link">Back to home</a>
         <header>
             <h1>作品集</h1>
             <p>魂を吹き込んだプラモデルの記録</p>
