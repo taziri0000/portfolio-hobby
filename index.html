@@ -6,19 +6,35 @@
     <meta name="viewport"
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <link rel="stylesheet" href="style.css">
-    <title>Space Skirmish: GP02 True Forward Saber Fixed</title>
+    <title>ポートフォリオ ガンプラ作品集とガンプラ情報ブログ</title>
 
     <style>
+        :root {
+            --bg: #0a0a0c;
+            --text: #e0e0e0;
+            --accent: #1900ffeb;
+            --accent2: #ff0000;
+            --boder: #faf624;
+
+        }
+
         html,
         body {
             margin: 0;
             padding: 0;
             overflow-y: auto;
             overflow-x: hidden;
-            background-color: #000;
+            background-color: var(--bg);
             font-family: 'Courier New', Courier, monospace;
             user-select: none;
             -webkit-user-select: none;
+        }
+
+        .title h1 {
+            width: 100%;
+            text-align: center;
+            color: var(--text);
+            font-size: 4vw;
         }
 
         #game-wrapper {
@@ -50,7 +66,7 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            color: #00ffaa;
+            color: var(--boder);
             z-index: 20;
             cursor: pointer;
             text-align: center;
@@ -60,13 +76,13 @@
 
         #instructions h1 {
             font-size: 1.8rem;
-            text-shadow: 0 0 12px #00ffaa;
+            text-shadow: 0 0 12px var(--boder);
             margin-bottom: 5px;
         }
 
         #instructions p {
             font-size: 0.95rem;
-            color: #fff;
+            color: var(--text);
             margin: 5px;
         }
 
@@ -79,7 +95,7 @@
             z-index: 10;
             pointer-events: none;
             box-sizing: border-box;
-            border: 2px solid #00ffff;
+            border: 2px solid var(--accent);
             box-shadow: inset 0 0 100px rgba(0, 253, 255, 0.1);
             display: none;
         }
@@ -91,7 +107,7 @@
             transform: translate(-50%, -50%);
             width: 40px;
             height: 40px;
-            border: 2px solid #00ffff;
+            border: 2px solid var(--accent);
             border-radius: 50%;
         }
 
@@ -99,7 +115,7 @@
         .reticle::after {
             content: '';
             position: absolute;
-            background: #00ffff;
+            background: var(--accent2);
         }
 
         .reticle::before {
@@ -121,13 +137,13 @@
             bottom: 4%;
             left: 50%;
             transform: translateX(-50%);
-            color: #00ffaa;
+            color: var(--boder);
             font-size: 0.8rem;
             font-weight: bold;
             background: rgba(0, 25, 15, 0.85);
             padding: 5px 15px;
-            border: 1px solid #00ffaa;
-            text-shadow: 0 0 5px #00ffaa;
+            border: 1px solid var(--boder);
+            text-shadow: 0 0 5px var(--boder);
             white-space: nowrap;
         }
 
@@ -138,25 +154,25 @@
             transform: translate(-50%, -50%);
             width: 60px;
             height: 60px;
-            border: 2px solid #ff3333;
+            border: 2px solid var(--accent2);
             border-radius: 50%;
             display: none;
-            color: #ff3333;
+            color: var(--accent2);
             font-weight: bold;
             text-align: center;
             line-height: 60px;
-            text-shadow: 0 0 8px #ff3333;
-            box-shadow: 0 0 10px #ff3333;
+            text-shadow: 0 0 8px var(--accent2);
+            box-shadow: 0 0 10px var(--accent2);
         }
 
         .score-board {
             position: absolute;
             top: 4%;
             right: 4%;
-            color: #00ffff;
+            color: var(--boder);
             font-weight: bold;
             font-size: 1rem;
-            text-shadow: 0 0 5px #00ffff;
+            text-shadow: 0 0 5px var(--boder);
         }
 
         #mobile-controls {
@@ -184,8 +200,8 @@
             width: 36px;
             height: 36px;
             background: rgba(0, 253, 255, 0.25);
-            border: 1px solid #00ffff;
-            color: #00ffff;
+            border: 1px solid var(--boder);
+            color: var(--boder);
             text-align: center;
             line-height: 34px;
             font-size: 0.9rem;
@@ -225,21 +241,21 @@
             width: 75px;
             height: 75px;
             background: rgba(255, 50, 50, 0.3);
-            border: 2px solid #ff3333;
+            border: 2px solid var(--accent2);
             border-radius: 50%;
-            color: #ff3333;
+            color: var(--accent2);
             font-weight: bold;
             text-align: center;
             line-height: 71px;
             font-size: 1.1rem;
             pointer-events: auto;
-            text-shadow: 0 0 5px #ff3333;
+            text-shadow: 0 0 5px var(--accent2);
             box-shadow: 0 0 10px rgba(255, 50, 50, 0.2);
         }
 
         #btn-fire:active {
             background: rgba(255, 50, 50, 0.8);
-            color: #fff;
+            color: var(--text);
         }
 
         #btn-exit {
@@ -248,8 +264,8 @@
             left: 4%;
             padding: 6px 12px;
             background: rgba(255, 255, 255, 0.1);
-            border: 1px solid #fff;
-            color: #fff;
+            border: 1px solid var(--text);
+            color: var(--text);
             font-size: 0.8rem;
             border-radius: 4px;
             pointer-events: auto;
@@ -260,10 +276,10 @@
         .article-section {
             position: relative;
             z-index: 30;
-            background-color: #0b0f19;
-            color: #ffffff;
+            background-color: var(--bg);
+            color: var(--text);
             padding: 40px 20px;
-            min-height: 100vh;
+            min-height: 40vh;
         }
 
         .article-container {
@@ -272,8 +288,9 @@
         }
 
         .article-section h2 {
-            color: #00ffff;
-            border-bottom: 2px solid #00ffff;
+            text-align: center;
+            color: var(--text);
+            border-bottom: 2px solid var(--accent);
             padding-bottom: 10px;
             font-size: 1.6rem;
         }
@@ -313,30 +330,46 @@
     </div>
 
     <div class="article-section">
+
         <div class="article-container">
-            <h2>趣味の置き場所</h2>
+            <h2>ガンプラ入手情報</h2>
             <p style="line-height: 1.8; color: #ccc; font-size: 1.05rem;">
                 一応ポートフォリオですが、趣味であるプラモデルとその関連の情報をアップしていきます。
             </p>
-            <a href="note.html">ガンプラ作品集</a>
         </div>
     </div>
-    <div class="note">
-        <h2>今日は6月17日</h2><br>
-        <p>一昨日は1/144 HTE Oの再販日でしたが家電量販店やホビーショップでもその姿を見かけることは無かったですがやっとヨドバシでゲット。<br>中身はこんなんでした。</p>
-        <img src="images/名称未設定のデザイン.jpg" alt="THE O開封画像">
-        <img src="images/the o2.jpg" alt="THE O開封画像2">
+    <section class="blog-section">
+        <div class="blog-container">
+            <div class="section-header">
+                <h2>LATEST UPDATES</h2>
+                <a href="note.html" class="btn-gallery">GALLERY →</a>
+            </div>
 
-        <h2>6月18日</h2><br>
-        <p>今日はフリーダムガンダムspec2とザク2改がHGでの発売だったみたい。<br>
-            フリーダムに至ってはゼウスシルエットなるもので価格はおよそ8000円でした。<br>
-            もちろん、お金が無くて変えませんでした。しかし、ジョーシンでなんとカバカーリーゲット！<br>
-            Gのレコンギスタのカバカーリー売ってるの初めて見ました。<br>
-        </p>
-        <img src="images/kabakali.jpg" alt="カバカーリーゲット画像">
+            <div class="post-grid">
+                <article class="post-card">
+                    <span class="date">2026.06.18</span>
+                    <h3>カバカーリーを入手</h3>
+                    <p>『Gのレコンギスタ』よりカバカーリーをゲット。初めての実店舗での遭遇に感激しました。</p>
+                    <img src="images/kabakali.jpg" alt="カバカーリー">
+                </article>
 
+                <article class="post-card">
+                    <span class="date">2026.06.17</span>
+                    <h3>THE O 開封レポート</h3>
+                    <p>待望の1/144 THE O。圧巻のボリュームとパーツ構成を検証します。</p>
+                    <img src="images/名称未設定のデザイン.jpg" alt="THE O">
+                </article>
 
-    </div>
+                <article class="post-card">
+                    <span class="date">2026.06.21</span>
+                    <h3>ディスティニーガンダム SPEC2 ゼウスシルエット入手</h3>
+                    <p>6月18日発売日に売り場に並んでいなかったが、本日並んでいて購入できました。</p>
+                    <img src="images/destiny_1.jpg" alt="destiny">
+                </article>
+
+            </div>
+        </div>
+    </section>
     <script type="importmap">
         {
             "imports": {

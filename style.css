@@ -1,5 +1,12 @@
        @charset "UTF-8";
 
+       :root{
+            --bg: #0a0a0c;
+            --text: #e0e0e0;
+            --accent: #1900ffeb;
+            --accent2: #ff0000;
+            --boder: #faf624;
+        }
 
         body, html {
             margin: 0; padding: 0;
@@ -8,136 +15,204 @@
             user-select: none;
         }
 
-        #canvas-container { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; z-index: 1; }
+        #canvas-container {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100vh;
+            z-index: 1;
+        }
 
         #instructions {
             position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
             background: rgba(0,0,0,0.85);
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            color: #00ffff; z-index: 20; cursor: pointer; text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: var(--boder);
+            z-index: 20;
+            cursor: pointer;
+            text-align: center;
         }
-        #instructions h1 { font-size: 2.2rem; text-shadow: 0 0 12px #00ffff; margin-bottom: 5px; }
-        #instructions p { font-size: 1.1rem; color: #fff; margin: 5px; }
+        #instructions h1 {
+            font-size: 2.2rem;
+            text-shadow: 0 0 12px var(--boder);
+            margin-bottom: 5px;
+        }
+        #instructions p {
+            font-size: 1.1rem;
+            color: var(--text);
+            margin: 5px;
+        }
 
         #hud-container {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
-            z-index: 10; pointer-events: none; box-sizing: border-box;
-            border: 2px solid #00ffff;
+            position: fixed; top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            z-index: 10;
+            pointer-events: none;
+            box-sizing: border-box;
+            border: 2px solid var(--boder);
             box-shadow: inset 0 0 100px rgba(0, 253, 255, 0.15);
             display: none;
         }
 
         .reticle {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 50px; height: 50px; border: 2px solid #00ffff; border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50px;
+            height: 50px;
+            border: 2px solid var(--boder);
+            border-radius: 50%;
         }
-        .reticle::before, .reticle::after { content: ''; position: absolute; background: #00ffff; }
-        .reticle::before { top: 24px; left: -15px; width: 15px; height: 2px; }
-        .reticle::after { top: 24px; right: -15px; width: 15px; height: 2px; }
+        .reticle::before, .reticle::after {
+            content: '';
+            position: absolute;
+            background: var(--boder);
+        }
+        .reticle::before {
+            top: 24px;
+            left: -15px;
+            width: 15px;
+            height: 2px;
+        }
+
+        .reticle::after {
+            top: 24px;
+            right: -15px;
+            width: 15px;
+            height: 2px;
+        }
 
         .weapon-status {
-            position: absolute; bottom: 8%; left: 50%; transform: translateX(-50%);
-            color: #00ffff; font-size: 1.1rem; font-weight: bold;
-            background: rgba(0,20,25,0.85); padding: 10px 25px; border: 1px solid #00ffff;
-            text-shadow: 0 0 5px #00ffff;
+            position: absolute;
+            bottom: 8%;
+            left: 50%;
+            transform: translateX(-50%);
+            color: var(--boder);
+            font-size: 1.1rem;
+            font-weight: bold;
+            background: rgba(0,20,25,0.85);
+            padding: 10px 25px;
+            border: 1px solid var(--boder);
+            text-shadow: 0 0 5px var(--boder);
         }
 
         .hit-indicator {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 70px; height: 70px; border: 2px solid #ff3333; border-radius: 50%;
-            display: none; color: #ff3333; font-weight: bold; text-align: center; line-height: 70px;
-            text-shadow: 0 0 8px #ff3333; box-shadow: 0 0 10px #ff3333;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 70px;
+            height: 70px;
+            border: 2px solid var(--accent2);
+            border-radius: 50%;
+            display: none;
+            color: var(--accent2);
+            font-weight: bold;
+            text-align: center;
+            line-height: 70px;
+            text-shadow: 0 0 8px var(--accent2);
+            box-shadow: 0 0 10px var(--accent2);
         }
 
         .score-board {
-            position: absolute; top: 4%; right: 4%; color: #00ffff; font-weight: bold;
-            font-size: 1.2rem; text-shadow: 0 0 5px #00ffff;
+            position: absolute;
+            top: 4%;
+            right: 4%;
+            color: var(--boder);
+            font-weight: bold;
+            font-size: 1.2rem;
+            text-shadow: 0 0 5px var(--boder);
         }
 
-        .note h2,
-        p{
-            padding-top: 15vh;
-            width: 80%;
+
+        /* ブログ部分 */
+        .blog-section {
+            padding: 60px 20px;
+            background: #0a0a0c
+        }
+        .blog-container {
+            max-width: 900px;
             margin: 0 auto;
-            text-align: center;
-            font-size: 2vw;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            border-bottom: 2px solid #222;
+            padding-bottom: 10px;
+        }
+
+        .section-header h2 {
             color: #fff;
+            letter-spacing: 2px;
         }
-
-        .note img{
-            display: block;
-            width: 80%;
-            overflow: visible;
-            margin: 0 auto;
-        }
-        .article-section a{
+        
+        .btn-gallery {
             position: fixed;
-            top: 10vh;
-            right: 5vw;
-            font-size: 4vw;
+            top: 3vh;
+            right: 4vw;
+            font-size: 2.5vw;
+            color: var(--accent);
+            text-shadow: #FFF 1px 1px 1px;
             text-decoration: none;
+            border: 1px solid var(--text);
+            padding: 8px 20px;
+            transition: 0.3s;
+            z-index: 4000;
         }
 
-        .article-section a:hover{
-            font-size: 6vw;
+        .btn-gallery:hover { 
+            background: var(--boder);
+            color: #000;
+        }
+
+        .post-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+        
+        .post-card {
+            background: #16161a;
+            padding: 20px;
+            border-radius: 8px;
+            transition: transform 0.3s;
+        }
+
+        .post-card:hover {
+            transform: translateY(-10px);
+            border: 1px solid var(--accent2);
+        }
+        
+        .post-card .date {
+            color: var(--boder);
+            font-size: 0.8rem;
+        }
+
+        .post-card h3 {
             color: #fff;
+            margin: 10px 0;
+        }
+
+        .post-card p {
+            color: #aaa;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+        }
+        .post-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 4px;
         }
 
 
-        .return a{
-            display: block;
-            position: fixed;
-            top: 5vh;
-            right: 5vw;
-            text-decoration: none;
 
-            
-        }
-
-        .return a:hover{
-            font-size: 4vw;
-            color: #fff;
-        }
-
-        .return h2{
-            color: mediumblue;
-            text-align: center;
-            font-size: 3vw;
-        }
-
-        .return2 h2{
-            padding-top: 5vh;
-            color: red;
-            text-align: center;
-            font-size: 3vw;
-   
-        }
-
-        .return3 h2{
-            padding-top: 5vh;
-            color: yellowgreen;
-            text-align: center;
-            font-size: 3vw;
-        }
-
-        .return4 h2{
-            padding-top: 5vh;
-            color: green;
-            text-align: center;
-            font-size: 3vw;
-        }
-
-        .object img{
-            display: block;
-            width: 80%;
-            margin: 0 auto;
-        }
-
-        .title h1{
-            display: block;
-            height: 10vh;
-            font-size: 6vw;
-            color: #fff;
-            text-align: center;
-        }
 

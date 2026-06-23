@@ -1,87 +1,220 @@
 <!DOCTYPE html>
 <html lang="ja">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
-    <title>Document</title>
-</head>
-
-<body>
-    <h1>作品集</h1>
-    <p>作品を作ってかっこよく撮影して、プラモデルに魂を吹き込んでいく作業所です。</p>
-    <div class="return">
-        <a href="index.html">趣味の置き場所</a>
-        <h2>作品名 GP02A サイサリス</h2>
-        <p>ノーマルのHGサイサリスにスジボリを彫ってディテールをプラスした。<br>
-        更に水転写デカールを貼り付けて立体感をプラスした。<br>
-    我ながら最高の出来だと思う。</p>
+    <title>作品集 | G-PORTFOLIO</title>
+    <style>
+        :root {
+            --bg: #0a0a0c;
+            --text: #e0e0e0;
+            --accent: #1900ffeb;
+            --accent2: #ff0000;
         
+        }
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            padding: 40px 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: var(--accent);
+            text-shadow: #fff 1px 1px 1px;
+            text-decoration: none;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--accent2);
+
+        }
+
+        .back-link:hover {
+            font-size: 3vw;
+            transition: 0.5s;
+        }
+
+        .work-section {
+            margin-bottom: 80px;
+        }
+
+        .work-header {
+            border-left: 4px solid var(--accent);
+            padding-left: 20px;
+            margin-bottom: 20px;
+        }
+
+        .work-header h2 {
+            margin: 0;
+            font-size: 1.8rem;
+            color: #fff;
+        }
+
+
+        /* グリッドレイアウト */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .gallery-img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.3s ease, filter 0.3s ease;
+        }
+        .gallery-img:hover {
+            transform: scale(1.2);
+            filter: brightness(1.2);
+        }
+
+        /* モーダル（拡大表示） */
+        .modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.95); z-index: 1000;
+            justify-content: center; align-items: center; cursor: zoom-out;
+        }
+
+        .modal img {
+            max-width: 90%;
+            max-height: 90%;
+            border: 3px solid var(--accent2);
+            border-radius: 4px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <a href="index.html" class="back-link">← ホームへ戻る</a>
+        <header>
+            <h1>作品集</h1>
+            <p>魂を吹き込んだプラモデルの記録</p>
+        </header>
+
+        <section class="work-section">
+            <div class="work-header">
+                <h2>GP02A サイサリス</h2>
+                <p>スジボリと水転写デカールで立体感を強調したHGの改造機。</p>
+            </div>
+            <div class="gallery-grid">
+                <img src="images/gp02_1.jpg" class="gallery-img" alt="GP02-1">
+                <img src="images/gp02_2.jpg" class="gallery-img" alt="GP02-2">
+                <img src="images/gp02_3.jpg" class="gallery-img" alt="GP02-3">
+                <img src="images/gp02_04.jpg" class="gallery-img" alt="GP02-4">
+            </div>
+        </section>
+
+        <section class="work-section">
+            <div class="work-header">
+                <h2>シャイニングガンダム RG</h2>
+                <p>格闘ポーズが映える、2025年最新キット。</p>
+            </div>
+            <div class="gallery-grid">
+                <img src="images/shining_01.jpg" class="gallery-img" alt="Shining-1">
+                <img src="images/shining_02.jpg" class="gallery-img" alt="Shining-2">
+                <img src="images/shing_03.jpg" class="gallery-img" alt="Shining-3">
+                <img src="images/shing_04.jpg" class="gallery-img" alt="Shining-4">
+            </div>
+        </section>
+
+        <section class="work-section">
+            <div class="work-header">
+                <h2>Ξガンダム</h2>
+                <p>映画、閃光のハサウェイの主役機。2026年注目のガンダム。</p>
+            </div>
+            <div class="gallery-grid">
+                <img src="images/xi_01.jpg" class="gallery-img" alt="xi-1">
+                <img src="images/xi_02.jpg" class="gallery-img" alt="xi-2">
+                <img src="images/xi_03.jpg" class="gallery-img" alt="xi-3">
+            </div>
+        </section>
+
+
+        <section class="work-section">
+            <div class="work-header">
+                <h2>ペーネロペー HG</h2>
+                <p>圧倒的なボリューム感。閃光のハサウェイより。</p>
+            </div>
+            <div class="gallery-grid">
+                <img src="images/penerope_01.jpg" class="gallery-img" alt="Penerope-1">
+                <img src="images/penerope_02.jpg" class="gallery-img" alt="Penerope-2">
+                <img src="images/penerope_03.jpg" class="gallery-img" alt="Penerope-3">
+            </div>
+        </section>
+
+        <section class="work-section">
+            <div class="work-header">
+                <h2>ザクⅡ RG</h2>
+                <p>かなり前に発売されたリアルグレード。フレームはアドバンスドMSジョイント。</p>
+            </div>
+            <div class="gallery-grid">
+                <img src="images/zaku2_01.jpg" class="gallery-img" alt="zaku-1">
+                <img src="images/zaku2_02.jpg" class="gallery-img" alt="zaku-2">
+                <img src="images/zaku2_03.jpg" class="gallery-img" alt="zaku-3">
+                <img src="images/zaku2_04.jpg" class="gallery-img" alt="zaku-3">
+
+            </div>
+        </section>
+
+        <section class="work-section">
+            <div class="work-header">
+                <h2>デストロイガンダム HG</h2>
+                <p>ガンダムSEEDに出てくる巨大モビルアーマー。圧倒的な火力で周りを焼き尽くす。</p>
+            </div>
+            <div class="gallery-grid">
+                <img src="images/destroy_01.jpg" class="gallery-img" alt="destroy-1">
+                <img src="images/destroy_03.jpg" class="gallery-img" alt="destroy-2">
+
+            </div>
+        </section>
+
+
+        <section class="work-section">
+            <div class="work-header">
+                <h2>ナイチンゲール HG</h2>
+                <p>逆襲のシャアに出てくるシャア専用のモビルスーツ。圧倒的な力を見せつけた。</p>
+            </div>
+            <div class="gallery-grid">
+                <img src="images/nitingale_02.jpg" class="gallery-img" alt="nitingale-1">
+                <img src="images/nitingale_01.jpg" class="gallery-img" alt="nitingale-2">
+
+            </div>
+        </section>
+
+
     </div>
 
-        <div class="object">
-        <a href="https://bandai-hobby.net/item/01_5607/" target="_blank"><img src="images/gp02_1.jpg" alt="" ></a>
-        <a href="https://bandai-hobby.net/item/01_5607/" target="_blank"><img src="images/gp02_2.jpg" alt=""></a>
-        <a href="https://bandai-hobby.net/item/01_5607/" target="_blank"><img src="images/gp02_3.jpg" alt=""></a>
-        <a href="https://bandai-hobby.net/item/01_5607/" target="_blank"><img src="images/gp02_04.jpg" alt=""></a>
-
-
+    <div id="imageModal" class="modal" onclick="this.style.display='none'">
+        <img id="modalImg" src="" alt="拡大画像">
     </div>
 
-    <div class="return2">
-        <h2>作品名 シャイニングガンダムRG</h2>
-        <p>2025年に発売したシャイニングガンダムRG。<br>
-            細かな変形ギミック内蔵の可動領域が半端ないプラモデル。<br>
-            格闘タイプということもあって激しいポーズが取れるのが魅力。
-        </p>
-    </div>
-
-    <div class="object">
-        <a href="https://bandai-hobby.net/item/01_5544/" target="_blank"><img src="images/shining_01.jpg" alt="" ></a>
-        <a href="https://bandai-hobby.net/item/01_5544/" target="_blank"><img src="images/shining_02.jpg" alt=""></a>
-        <a href="https://bandai-hobby.net/item/01_5544/" target="_blank"><img src="images/shing_03.jpg" alt=""></a>
-        <a href="https://bandai-hobby.net/item/01_5544/" target="_blank"><img src="images/shing_04.jpg" alt=""></a>
-
-
-    </div>
-
-
-        <div class="return3">
-        <h2>作品名 ペーネロペーHG</h2>
-        <p>映画、閃光のハサウェイのライバル機。<br>
-            かなりの大型キット。しかしパーツが大きいだけで作りやすい印象。<br>
-            可動域はあまり良くないが見た目は凄くかっこいい。
-        </p>
-    </div>
-
-    <div class="object">
-        <a href="https://bandai-hobby.net/item/01_2443/" target="_blank"><img src="images/penerope_01.jpg" alt="" ></a>
-        <a href="https://bandai-hobby.net/item/01_2443/" target="_blank"><img src="images/penerope_02.jpg" alt=""></a>
-        <a href="https://bandai-hobby.net/item/01_2443/" target="_blank"><img src="images/penerope_03.jpg" alt=""></a>
-
-
-    </div>
-
-
-            <div class="return4">
-        <h2>作品名 ザク2RG</h2>
-        <p>ガンダムのやられ役といえばコレ。<br>
-            ザクがRGになるとこんなディティールが入っているのかと驚く。<br>
-            アドバンスドMSジョイントの動きは少し特殊でポーズを決めるのが難しい印象。
-        </p>
-    </div>
-
-    <div class="object">
-        <a href="https://bandai-hobby.net/item/01_2224/" target="_blank"><img src="images/zaku2_01.jpg" alt="" ></a>
-        <a href="https://bandai-hobby.net/item/01_2224/" target="_blank"><img src="images/zaku2_02.jpg" alt=""></a>
-        <a href="https://bandai-hobby.net/item/01_2224/" target="_blank"><img src="images/zaku2_03.jpg" alt=""></a>
-        <a href="https://bandai-hobby.net/item/01_2224/" target="_blank"><img src="images/zaku2_04.jpg" alt=""></a>
-
-    </div>
-
-
-
+    <script>
+        // 画像クリックで拡大
+        document.querySelectorAll('.gallery-img').forEach(img => {
+            img.addEventListener('click', function() {
+                const modal = document.getElementById('imageModal');
+                const modalImg = document.getElementById('modalImg');
+                modal.style.display = 'flex';
+                modalImg.src = this.src;
+            });
+        });
+    </script>
 </body>
-
 </html>
