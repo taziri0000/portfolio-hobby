@@ -132,10 +132,10 @@
                 <p>スジボリと水転写デカールで立体感を強調したHGの改造機。</p>
             </div>
             <div class="gallery-grid fade">
-                <img src="images/gp02_1.jpg" class="gallery-img" alt="GP02-1">
-                <img src="images/gp02_2.jpg" class="gallery-img" alt="GP02-2">
-                <img src="images/gp02_3.jpg" class="gallery-img" alt="GP02-3">
-                <img src="images/gp02_04.jpg" class="gallery-img" alt="GP02-4">
+                <img src="images/gp02_1.jpg" class="gallery-img fade" alt="GP02-1">
+                <img src="images/gp02_2.jpg" class="gallery-img fade" alt="GP02-2">
+                <img src="images/gp02_3.jpg" class="gallery-img fade" alt="GP02-3">
+                <img src="images/gp02_04.jpg" class="gallery-img fade" alt="GP02-4">
             </div>
         </section>
 
@@ -145,10 +145,10 @@
                 <p>格闘ポーズが映える、2025年最新キット。</p>
             </div>
             <div class="gallery-grid fade">
-                <img src="images/shining_01.jpg" class="gallery-img" alt="Shining-1">
-                <img src="images/shining_02.jpg" class="gallery-img" alt="Shining-2">
-                <img src="images/shing_03.jpg" class="gallery-img" alt="Shining-3">
-                <img src="images/shing_04.jpg" class="gallery-img" alt="Shining-4">
+                <img src="images/shining_01.jpg" class="gallery-img fade" alt="Shining-1">
+                <img src="images/shining_02.jpg" class="gallery-img fade" alt="Shining-2">
+                <img src="images/shing_03.jpg" class="gallery-img fade" alt="Shining-3">
+                <img src="images/shing_04.jpg" class="gallery-img fade" alt="Shining-4">
             </div>
         </section>
 
@@ -158,9 +158,9 @@
                 <p>映画、閃光のハサウェイの主役機。2026年注目のガンダム。</p>
             </div>
             <div class="gallery-grid fade">
-                <img src="images/xi_01.jpg" class="gallery-img" alt="xi-1">
-                <img src="images/xi_02.jpg" class="gallery-img" alt="xi-2">
-                <img src="images/xi_03.jpg" class="gallery-img" alt="xi-3">
+                <img src="images/xi_01.jpg" class="gallery-img fade" alt="xi-1">
+                <img src="images/xi_02.jpg" class="gallery-img fade" alt="xi-2">
+                <img src="images/xi_03.jpg" class="gallery-img fade" alt="xi-3">
             </div>
         </section>
 
@@ -171,9 +171,9 @@
                 <p>圧倒的なボリューム感。閃光のハサウェイより。</p>
             </div>
             <div class="gallery-grid fade">
-                <img src="images/penerope_01.jpg" class="gallery-img" alt="Penerope-1">
-                <img src="images/penerope_02.jpg" class="gallery-img" alt="Penerope-2">
-                <img src="images/penerope_03.jpg" class="gallery-img" alt="Penerope-3">
+                <img src="images/penerope_01.jpg" class="gallery-img fade" alt="Penerope-1">
+                <img src="images/penerope_02.jpg" class="gallery-img fade" alt="Penerope-2">
+                <img src="images/penerope_03.jpg" class="gallery-img fade" alt="Penerope-3">
             </div>
         </section>
 
@@ -183,10 +183,10 @@
                 <p>かなり前に発売されたリアルグレード。フレームはアドバンスドMSジョイント。</p>
             </div>
             <div class="gallery-grid fade">
-                <img src="images/zaku2_01.jpg" class="gallery-img" alt="zaku-1">
-                <img src="images/zaku2_02.jpg" class="gallery-img" alt="zaku-2">
-                <img src="images/zaku2_03.jpg" class="gallery-img" alt="zaku-3">
-                <img src="images/zaku2_04.jpg" class="gallery-img" alt="zaku-3">
+                <img src="images/zaku2_01.jpg" class="gallery-img fade" alt="zaku-1">
+                <img src="images/zaku2_02.jpg" class="gallery-img fade" alt="zaku-2">
+                <img src="images/zaku2_03.jpg" class="gallery-img fade" alt="zaku-3">
+                <img src="images/zaku2_04.jpg" class="gallery-img fade" alt="zaku-3">
 
             </div>
         </section>
@@ -197,8 +197,8 @@
                 <p>ガンダムSEEDに出てくる巨大モビルアーマー。圧倒的な火力で周りを焼き尽くす。</p>
             </div>
             <div class="gallery-grid fade">
-                <img src="images/destroy_01.jpg" class="gallery-img" alt="destroy-1">
-                <img src="images/destroy_03.jpg" class="gallery-img" alt="destroy-2">
+                <img src="images/destroy_01.jpg" class="gallery-img fade" alt="destroy-1">
+                <img src="images/destroy_03.jpg" class="gallery-img fade" alt="destroy-2">
 
             </div>
         </section>
@@ -210,8 +210,8 @@
                 <p>逆襲のシャアに出てくるシャア専用のモビルスーツ。圧倒的な力を見せつけた。</p>
             </div>
             <div class="gallery-grid fade">
-                <img src="images/nitingale_02.jpg" class="gallery-img" alt="nitingale-1">
-                <img src="images/nitingale_01.jpg" class="gallery-img" alt="nitingale-2">
+                <img src="images/nitingale_02.jpg" class="gallery-img fade" alt="nitingale-1">
+                <img src="images/nitingale_01.jpg" class="gallery-img fade" alt="nitingale-2">
 
             </div>
         </section>
@@ -241,7 +241,7 @@
             const fadeItem2 = document.querySelectorAll('.fade');
             fadeItem2.forEach(item => {
                 const itemTop2 = item.getBoundingClientRect().top;
-                const trigger2 = window.innerHeight * 0.65;
+                const trigger2 = window.innerHeight * 0.75;
                 if (itemTop2 < trigger2) {
                     item.classList.add('show');
                 }
