@@ -298,6 +298,26 @@
             padding-bottom: 10px;
             font-size: 1.6rem;
         }
+
+        .fade {
+
+            opacity: 0;
+
+            transform: translateY(50px);
+
+            transition: 1s;
+
+        }
+
+
+
+        .fade.show {
+
+            opacity: 1;
+
+            transform: translateY(0);
+
+        }
     </style>
 </head>
 
@@ -353,21 +373,21 @@
 
             <div class="post-grid">
 
-                <article class="post-card">
+                <article class="post-card fade">
                     <span class="date">2026.06.25</span>
                     <h3>ヤクトドーガ（クエス専用機）ヨドバシカメラにて再販品を入手</h3>
                     <p>午後4時ごろにはかなり数が減っていた模様。こちらは逆襲のシャアに登場するネオジオンのMSでファンネルを使いオールレンジ攻撃をしてくる。</p>
                     <img src="images/jacd-doga.jpg" alt="ヤクトドーガのガンプラ">
                 </article>
 
-                <article class="post-card">
+                <article class="post-card fade">
                     <span class="date">2026.06.21</span>
                     <h3>ディスティニーガンダム SPEC2 ゼウスシルエット入手</h3>
                     <p>6月18日発売日に売り場に並んでいなかったが、本日並んでいて購入できました。</p>
                     <img src="images/destiny_1.jpg" alt="ディスティニーガンダム ゼウスシルエットのガンプラ">
                 </article>
 
-                <article class="post-card">
+                <article class="post-card fade">
                     <span class="date">2026.06.18</span>
                     <h3>カバカーリーをイエローサブマリンで入手！</h3>
                     <p>『Gのレコンギスタ』よりカバカーリーをゲット。初めての実店舗での遭遇に感激しました。このキットはなかなか再販がなくかなりの入手困難を極める激レアキットのようです。
@@ -376,7 +396,7 @@
                     <img src="images/kabakali.jpg" alt="カバカーリーのガンプラ">
                 </article>
 
-                <article class="post-card">
+                <article class="post-card fade">
                     <span class="date">2026.06.17</span>
                     <h3>念願のTHE Oをヨドバシカメラで入手。</h3>
                     <p>1/144 THE O。圧巻のボリュームとパーツ構成。かなり完売が早く数時間後には在庫がなくなっていた。</p>
@@ -430,6 +450,8 @@
         const btnExit = document.getElementById('btn-exit');
         let destroyedCount = 0;
         let isGameActive = false;
+        window.addEventListener('scroll', fadeIn);
+        window.addEventListener('load', fadeIn); 
 
         function activateGame() {
             isGameActive = true;
@@ -828,6 +850,24 @@
             window.visualViewport.addEventListener('resize', updateSizes);
             window.visualViewport.addEventListener('scroll', updateSizes);
         }
+
+
+
+
+        function fadeIn() {
+            const fadeItems = document.querySelectorAll('.fade');
+
+            fadeItems.forEach(item => {
+                const itemTop = item.getBoundingClientRect().top;
+
+                const trigger = window.innerHeight * 0.65;
+
+                if (itemTop < trigger) {
+                    item.classList.add('show');
+                }
+            });
+        }
+
     </script>
 </body>
 

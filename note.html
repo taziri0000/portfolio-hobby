@@ -103,6 +103,18 @@
             border-radius: 4px;
         }
 
+                .fade{
+            opacity: 0;
+            transform: translateY(200px);
+            transition: 1.5s;
+        }
+
+        .fade.show{
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+
     </style>
 </head>
 <body>
@@ -119,7 +131,7 @@
                 <h2>GP02A サイサリス</h2>
                 <p>スジボリと水転写デカールで立体感を強調したHGの改造機。</p>
             </div>
-            <div class="gallery-grid">
+            <div class="gallery-grid fade">
                 <img src="images/gp02_1.jpg" class="gallery-img" alt="GP02-1">
                 <img src="images/gp02_2.jpg" class="gallery-img" alt="GP02-2">
                 <img src="images/gp02_3.jpg" class="gallery-img" alt="GP02-3">
@@ -132,7 +144,7 @@
                 <h2>シャイニングガンダム RG</h2>
                 <p>格闘ポーズが映える、2025年最新キット。</p>
             </div>
-            <div class="gallery-grid">
+            <div class="gallery-grid fade">
                 <img src="images/shining_01.jpg" class="gallery-img" alt="Shining-1">
                 <img src="images/shining_02.jpg" class="gallery-img" alt="Shining-2">
                 <img src="images/shing_03.jpg" class="gallery-img" alt="Shining-3">
@@ -145,7 +157,7 @@
                 <h2>Ξガンダム</h2>
                 <p>映画、閃光のハサウェイの主役機。2026年注目のガンダム。</p>
             </div>
-            <div class="gallery-grid">
+            <div class="gallery-grid fade">
                 <img src="images/xi_01.jpg" class="gallery-img" alt="xi-1">
                 <img src="images/xi_02.jpg" class="gallery-img" alt="xi-2">
                 <img src="images/xi_03.jpg" class="gallery-img" alt="xi-3">
@@ -158,7 +170,7 @@
                 <h2>ペーネロペー HG</h2>
                 <p>圧倒的なボリューム感。閃光のハサウェイより。</p>
             </div>
-            <div class="gallery-grid">
+            <div class="gallery-grid fade">
                 <img src="images/penerope_01.jpg" class="gallery-img" alt="Penerope-1">
                 <img src="images/penerope_02.jpg" class="gallery-img" alt="Penerope-2">
                 <img src="images/penerope_03.jpg" class="gallery-img" alt="Penerope-3">
@@ -170,7 +182,7 @@
                 <h2>ザクⅡ RG</h2>
                 <p>かなり前に発売されたリアルグレード。フレームはアドバンスドMSジョイント。</p>
             </div>
-            <div class="gallery-grid">
+            <div class="gallery-grid fade">
                 <img src="images/zaku2_01.jpg" class="gallery-img" alt="zaku-1">
                 <img src="images/zaku2_02.jpg" class="gallery-img" alt="zaku-2">
                 <img src="images/zaku2_03.jpg" class="gallery-img" alt="zaku-3">
@@ -184,7 +196,7 @@
                 <h2>デストロイガンダム HG</h2>
                 <p>ガンダムSEEDに出てくる巨大モビルアーマー。圧倒的な火力で周りを焼き尽くす。</p>
             </div>
-            <div class="gallery-grid">
+            <div class="gallery-grid fade">
                 <img src="images/destroy_01.jpg" class="gallery-img" alt="destroy-1">
                 <img src="images/destroy_03.jpg" class="gallery-img" alt="destroy-2">
 
@@ -197,7 +209,7 @@
                 <h2>ナイチンゲール HG</h2>
                 <p>逆襲のシャアに出てくるシャア専用のモビルスーツ。圧倒的な力を見せつけた。</p>
             </div>
-            <div class="gallery-grid">
+            <div class="gallery-grid fade">
                 <img src="images/nitingale_02.jpg" class="gallery-img" alt="nitingale-1">
                 <img src="images/nitingale_01.jpg" class="gallery-img" alt="nitingale-2">
 
@@ -221,6 +233,21 @@
                 modalImg.src = this.src;
             });
         });
+
+        window.addEventListener('scroll',fadeIn);
+        window.addEventListener('lode',fadeIn);
+
+        function fadeIn(){
+            const fadeItem2 = document.querySelectorAll('.fade');
+            fadeItem2.forEach(item => {
+                const itemTop2 = item.getBoundingClientRect().top;
+                const trigger2 = window.innerHeight * 0.65;
+                if (itemTop2 < trigger2) {
+                    item.classList.add('show');
+                }
+            });
+
+        }
     </script>
 </body>
 </html>
